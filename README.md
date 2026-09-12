@@ -1,8 +1,7 @@
 # SnapKeep
 
-> A privacy-first information and deadline assistant for students — turn messy circular screenshots into structured action items with AI, search with natural language, and keep your memory clutter-free.
+A privacy-first information and deadline assistant for students — turn messy circular screenshots into structured action items with AI, search with natural language, and keep your memory clutter-free.
 
----
 
 ## The Problem
 
@@ -16,7 +15,6 @@ Traditional note apps require manual typing, and generic AI tools keep screensho
 3. The image buffer is processed in RAM and discarded immediately — zero images stored on disk or cloud storage.
 4. Search your saved items using natural English ("What assignments are due this week?"), with automatic 7-day retention grace periods after deadlines pass.
 
----
 
 ## Key Features
 
@@ -28,7 +26,6 @@ Traditional note apps require manual typing, and generic AI tools keep screensho
 - **Deterministic 7-Day Retention:** Past-deadline items enter a 7-day grace period where students can click **KEEP (+7d)** or let obsolete notices auto-expire cleanly.
 - **Redis Query Caching:** Caches natural language query answers in Redis with automatic invalidation when items are created, modified, or confirmed.
 
----
 
 ## Tech Stack
 
@@ -38,10 +35,8 @@ Traditional note apps require manual typing, and generic AI tools keep screensho
 - **Caching:** Redis via `ioredis` (with automatic in-memory fallback for local dev)
 - **AI Engine:** Google Gemini (`gemini-1.5-flash`)
 - **Authentication:** JWT (Short-lived Access Token in Memory + Refresh Token in HttpOnly Cookie)
-- **Testing:** Vitest
 - **Containerization:** Docker & Docker Compose
 
----
 
 ## System Architecture
 
@@ -67,7 +62,6 @@ Traditional note apps require manual typing, and generic AI tools keep screensho
                     Student Response
 ```
 
----
 
 ## Project Structure
 
@@ -75,32 +69,31 @@ Traditional note apps require manual typing, and generic AI tools keep screensho
 SnapKeep/
 ├── backend/
 │   ├── src/
-│   │   ├── config/            # DB, Redis & Environment setup
-│   │   ├── controllers/       # Auth, Items, Query, Retention controllers
-│   │   ├── middleware/        # JWT auth, daily warnings, Multer memory storage
-│   │   ├── models/            # User and SnapItem Mongoose schemas & indexes
-│   │   ├── routes/            # Express route declarations
+│   │   ├── config/            
+│   │   ├── controllers/       
+│   │   ├── middleware/        
+│   │   ├── models/            
+│   │   ├── routes/            
 │   │   ├── services/
-│   │   │   ├── ai/            # Vision extraction & date ambiguity guards
-│   │   │   ├── query/         # Query intent parser, search service, query builder
-│   │   │   ├── retention/     # 7-day grace period & KEEP lifecycle
-│   │   │   └── cache/         # Redis query caching with fallback
-│   │   └── utils/             # Logger, API response helpers
-│   ├── tests/                 # Vitest test suites
+│   │   │   ├── ai/            
+│   │   │   ├── query/         
+│   │   │   ├── retention/     
+│   │   │   └── cache/         
+│   │   └── utils/             
+│   ├── tests/                 
 │   └── package.json
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── components/        # Dashboard, search, items, and UI components
-│   │   ├── context/           # AuthContext & token management
-│   │   ├── pages/             # Dashboard, Capture, Retention, Auth pages
-│   │   └── services/          # Axios client with interceptors
+│   │   ├── components/        
+│   │   ├── context/           
+│   │   ├── pages/             
+│   │   └── services/          
 │   └── package.json
 │
-└── docker-compose.yml         # Full-stack Docker orchestration
+└── docker-compose.yml         
 ```
 
----
 
 ## Getting Started
 
@@ -139,7 +132,6 @@ cd ../frontend
 cp .env.example .env
 ```
 
----
 
 ### 2. Run Locally
 
@@ -163,18 +155,7 @@ App runs at `http://localhost:5173` (API at `http://localhost:5000`).
 docker-compose up --build
 ```
 
----
 
-## Running Tests
-
-Unit and integration tests are powered by Vitest:
-
-```bash
-cd backend
-npm test
-```
-
----
 
 ## Engineering Trade-offs & Decisions
 
@@ -187,8 +168,12 @@ npm test
 3. **Smart Structured & Multi-Field Search vs. High-Dimensional Vectors:**
    For student queries involving specific subject codes (`CS301`, `SE-Lab`), deadlines (`due tomorrow`), and categories, deterministic date filters and compound MongoDB text indexes yield faster and more accurate results without incurring embedding API rate limits or cluster indexing overhead.
 
----
 
-## License
 
-MIT
+## Author
+
+**Gaurav Jain**
+
+B.Tech IT
+
+GitHub: [gauravjain8056](https://github.com/gauravjain8056)

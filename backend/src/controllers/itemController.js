@@ -58,7 +58,7 @@ export async function processScreenshot(req, res, next) {
       createdItems.push(snapItem);
     }
 
-    createdItems.forEach((si) => upsertItemVector(si).catch(console.warn));
+    await Promise.allSettled(createdItems.map((si) => upsertItemVector(si)));
     await invalidatePattern(`nlq:${req.user.id}:*`);
 
     const anyNeedsConfirmation = createdItems.some((i) => i.needsConfirmation);
@@ -203,7 +203,7 @@ export async function updateItem(req, res, next) {
     }
 
     await item.save();
-    upsertItemVector(item).catch(console.warn);
+    await upsertItemVector(item).catch(console.warn);
     await invalidatePattern(`nlq:${req.user.id}:*`);
 
     return ApiResponse.success(res, {
@@ -242,7 +242,7 @@ export async function confirmItem(req, res, next) {
     item.confidence = 1.0;
 
     await item.save();
-    upsertItemVector(item).catch(console.warn);
+    await upsertItemVector(item).catch(console.warn);
     await invalidatePattern(`nlq:${req.user.id}:*`);
 
     return ApiResponse.success(res, {

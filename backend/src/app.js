@@ -11,6 +11,8 @@ import itemRoutes from './routes/itemRoutes.js';
 import queryRoutes from './routes/queryRoutes.js';
 import retentionRoutes from './routes/retentionRoutes.js';
 
+import { getQdrantClient, isQdrantEnabled } from './config/qdrant.js';
+
 const app = express();
 
 app.use(helmet());
@@ -44,6 +46,44 @@ app.get('/health', (req, res) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     service: 'snapkeep-backend'
+  });
+});
+
+app.get('/api/qdrant-status', async (req, res) => {
+  const isEnabled = isQdrantEnabled();
+  let connectionStatus = isEnabled ? 'connecting' : 'disabled';
+  let details = null;
+
+  if (isEnabled) {
+    try {
+      const client = getQdrantClient();
+      const collections = await client.getCollections();
+      const exists = await client.collectionExists(config.qdrantCollection);
+      let collectionInfo = null;
+      if (exists && exists.exists) {
+        collectionInfo = await client.getCollection(config.qdrantCollection);
+      }
+      connectionStatus = 'connected';
+      details = {
+        collections: collections?.collections?.map((c) => c.name) || [],
+        targetCollection: config.qdrantCollection,
+        targetExists: Boolean(exists && exists.exists),
+        vectorSize: collectionInfo?.config?.params?.vectors?.size,
+        pointsCount: collectionInfo?.points_count
+      };
+    } catch (err) {
+      connectionStatus = 'error';
+      details = { error: err.message };
+    }
+  }
+
+  return res.json({
+    qdrantEnabled: isEnabled,
+    qdrantUrlConfigured: Boolean(config.qdrantUrl),
+    qdrantApiKeyConfigured: Boolean(config.qdrantApiKey),
+    embeddingModel: config.embeddingModel,
+    connectionStatus,
+    details
   });
 });
 

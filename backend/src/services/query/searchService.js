@@ -39,7 +39,13 @@ export async function searchUserItems(userId, queryText, intent, limit = 20) {
 
   if (searchTerm && intent.searchType !== 'structured') {
     const escapedTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(escapedTerm, 'i');
+    const words = searchTerm
+      .split(/\s+/)
+      .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .filter((w) => w.length > 1);
+
+    const regexPattern = words.length > 1 ? `(?:${escapedTerm})|(?:${words.join('|')})` : escapedTerm;
+    const regex = new RegExp(regexPattern, 'i');
 
     baseQuery.$or = [
       { title: regex },

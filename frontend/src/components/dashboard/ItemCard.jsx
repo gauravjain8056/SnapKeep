@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { CategoryBadge, PriorityBadge, RelevanceBadge, NeedsConfirmationBadge, RetentionBadge } from '../common/Badge';
 
-export const ItemCard = ({ item, onEdit, onConfirm, onKeep, onDelete, onViewDetails }) => {
+export const ItemCard = React.memo(({ item, onEdit, onConfirm, onKeep, onDelete, onViewDetails }) => {
   const [isKeeping, setIsKeeping] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -217,4 +217,4 @@ export const ItemCard = ({ item, onEdit, onConfirm, onKeep, onDelete, onViewDeta
       </div>
     </div>
   );
-};
+});

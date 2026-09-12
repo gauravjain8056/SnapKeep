@@ -5,6 +5,7 @@ import { getQueryCacheKey, cacheGet, cacheSet, invalidatePattern } from '../serv
 import { ApiResponse } from '../utils/apiResponse.js';
 import { config } from '../config/env.js';
 import { upsertItemVector, deleteItemVector } from '../services/vector/qdrantService.js';
+import mongoose from 'mongoose';
 
 export async function processScreenshot(req, res, next) {
   try {
@@ -130,17 +131,53 @@ export async function getItems(req, res, next) {
     }
 
     const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
-    const [items, total] = await Promise.all([
+    const now = new Date();
+    const threeDaysFromNow = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+
+    const [items, total, statsAgg] = await Promise.all([
       SnapItem.find(filter)
         .sort(sortOptions)
         .skip(skip)
         .limit(parseInt(limit, 10))
         .lean(),
-      SnapItem.countDocuments(filter)
+      SnapItem.countDocuments(filter),
+      SnapItem.aggregate([
+        { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+        {
+          $group: {
+            _id: null,
+            criticalCount: { $sum: { $cond: [{ $eq: ['$priority', 'critical'] }, 1, 0] } },
+            needsConfirmCount: { $sum: { $cond: [{ $eq: ['$needsConfirmation', true] }, 1, 0] } },
+            inRetentionCount: { $sum: { $cond: [{ $eq: ['$retention.status', 'retention'] }, 1, 0] } },
+            upcomingDeadlinesCount: {
+              $sum: {
+                $cond: [
+                  {
+                    $and: [
+                      { $gte: ['$deadline', now] },
+                      { $lte: ['$deadline', threeDaysFromNow] }
+                    ]
+                  },
+                  1,
+                  0
+                ]
+              }
+            }
+          }
+        }
+      ])
     ]);
+
+    const stats = statsAgg[0] || {
+      criticalCount: 0,
+      upcomingDeadlinesCount: 0,
+      needsConfirmCount: 0,
+      inRetentionCount: 0
+    };
 
     return ApiResponse.success(res, {
       items,
+      stats,
       pagination: {
         total,
         page: parseInt(page, 10),

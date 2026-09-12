@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Upload, Sparkles, AlertCircle, FileText, CheckCircle, ArrowLeft } from 'lucide-react';
 import api from '../services/api';
@@ -18,6 +18,14 @@ export const CapturePage = () => {
   const [error, setError] = useState('');
   const [confirmingItem, setConfirmingItem] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];

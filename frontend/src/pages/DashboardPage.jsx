@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, RefreshCw, Sparkles, Inbox } from 'lucide-react';
+import { Camera, RefreshCw, Sparkles, Inbox, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '../services/api';
 import { DailyWarningBanner } from '../components/dashboard/DailyWarningBanner';
 import { StatsOverview } from '../components/dashboard/StatsOverview';
@@ -13,6 +13,7 @@ import { EditItemModal } from '../components/items/EditItemModal';
 import { ConfirmModal } from '../components/items/ConfirmModal';
 import { EmptyState } from '../components/common/EmptyState';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { useDebounce } from '../hooks/useDebounce';
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
@@ -22,10 +23,15 @@ export const DashboardPage = () => {
   const [error, setError] = useState('');
 
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 300);
   const [category, setCategory] = useState('all');
   const [priority, setPriority] = useState('all');
   const [status, setStatus] = useState('all');
   const [needsConfirmationOnly, setNeedsConfirmationOnly] = useState(false);
+
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 12, pages: 1 });
+  const [statsData, setStatsData] = useState(null);
 
   const [isSearching, setIsSearching] = useState(false);
   const [searchResult, setSearchResult] = useState(null);
@@ -40,23 +46,36 @@ export const DashboardPage = () => {
       setIsLoading(true);
       setError('');
 
-      const params = {};
+      const params = {
+        page,
+        limit: 12
+      };
       if (category !== 'all') params.category = category;
       if (priority !== 'all') params.priority = priority;
       if (status !== 'all') params.status = status;
       if (needsConfirmationOnly) params.needsConfirmation = 'true';
-      if (search.trim()) params.search = search.trim();
+      if (debouncedSearch.trim()) params.search = debouncedSearch.trim();
 
       const res = await api.get('/api/items', { params });
-      if (res.data?.success && res.data?.data?.items) {
-        setItems(res.data.data.items);
+      if (res.data?.success && res.data?.data) {
+        setItems(res.data.data.items || []);
+        if (res.data.data.pagination) {
+          setPagination(res.data.data.pagination);
+        }
+        if (res.data.data.stats) {
+          setStatsData(res.data.data.stats);
+        }
       }
     } catch (err) {
       setError(err.response?.data?.error?.message || 'Failed to fetch items');
     } finally {
       setIsLoading(false);
     }
-  }, [category, priority, status, needsConfirmationOnly, search]);
+  }, [category, priority, status, needsConfirmationOnly, debouncedSearch, page]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [category, priority, status, needsConfirmationOnly, debouncedSearch]);
 
   useEffect(() => {
     fetchItems();
@@ -76,12 +95,12 @@ export const DashboardPage = () => {
     }
   };
 
-  const handleClearSearch = () => {
+  const handleClearSearch = useCallback(() => {
     setSearchResult(null);
     fetchItems();
-  };
+  }, [fetchItems]);
 
-  const handleKeep = async (itemId) => {
+  const handleKeep = useCallback(async (itemId) => {
     try {
       const res = await api.post(`/api/items/${itemId}/keep`);
       if (res.data?.success) {
@@ -90,24 +109,42 @@ export const DashboardPage = () => {
     } catch (err) {
       alert(err.response?.data?.error?.message || 'Failed to extend retention');
     }
-  };
+  }, [fetchItems]);
 
-  const handleDelete = async (itemId) => {
+  const handleDelete = useCallback(async (itemId) => {
     try {
       const res = await api.delete(`/api/items/${itemId}`);
       if (res.data?.success) {
         setItems((prev) => prev.filter((i) => i._id !== itemId));
-        if (searchResult) {
-          setSearchResult((prev) => ({
+        setPagination((prev) => ({
+          ...prev,
+          total: Math.max(0, prev.total - 1),
+          pages: Math.max(1, Math.ceil((prev.total - 1) / prev.limit))
+        }));
+        setSearchResult((prev) => {
+          if (!prev) return null;
+          return {
             ...prev,
             items: prev.items.filter((i) => i._id !== itemId)
-          }));
-        }
+          };
+        });
       }
     } catch (err) {
       alert(err.response?.data?.error?.message || 'Failed to delete item');
     }
-  };
+  }, []);
+
+  const handleEditItem = useCallback((item) => {
+    setEditItem(item);
+  }, []);
+
+  const handleConfirmItem = useCallback((item) => {
+    setConfirmItem(item);
+  }, []);
+
+  const handleViewDetails = useCallback((item) => {
+    setDetailItem(item);
+  }, []);
 
   const handleUpdate = async (itemId, updatedData) => {
     const res = await api.patch(`/api/items/${itemId}`, updatedData);
@@ -129,12 +166,14 @@ export const DashboardPage = () => {
     setPriority('all');
     setStatus('all');
     setNeedsConfirmationOnly(false);
+    setPage(1);
   };
 
   const handleFilterSelectFromStats = ({ priority: p, dueSoon, needsConfirmation, status: s }) => {
     if (p) setPriority(p);
     if (s) setStatus(s);
     if (needsConfirmation) setNeedsConfirmationOnly(true);
+    setPage(1);
   };
 
   return (
@@ -147,15 +186,15 @@ export const DashboardPage = () => {
         <SearchResultsView
           searchResult={searchResult}
           onClearSearch={handleClearSearch}
-          onEdit={(item) => setEditItem(item)}
-          onConfirm={(item) => setConfirmItem(item)}
+          onEdit={handleEditItem}
+          onConfirm={handleConfirmItem}
           onKeep={handleKeep}
           onDelete={handleDelete}
-          onViewDetails={(item) => setDetailItem(item)}
+          onViewDetails={handleViewDetails}
         />
       ) : (
         <>
-          <StatsOverview items={items} onFilterSelect={handleFilterSelectFromStats} />
+          <StatsOverview items={items} statsData={statsData} onFilterSelect={handleFilterSelectFromStats} />
 
           <ItemFilterBar
             search={search}
@@ -174,7 +213,7 @@ export const DashboardPage = () => {
           <div>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300">
-                Saved Action Memories ({items.length})
+                Saved Action Memories ({pagination.total || items.length})
               </h3>
               <button
                 onClick={fetchItems}
@@ -192,19 +231,74 @@ export const DashboardPage = () => {
                 {error}
               </div>
             ) : items.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {items.map((item) => (
-                  <ItemCard
-                    key={item._id}
-                    item={item}
-                    onEdit={(i) => setEditItem(i)}
-                    onConfirm={(i) => setConfirmItem(i)}
-                    onKeep={handleKeep}
-                    onDelete={handleDelete}
-                    onViewDetails={(i) => setDetailItem(i)}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {items.map((item) => (
+                    <ItemCard
+                      key={item._id}
+                      item={item}
+                      onEdit={handleEditItem}
+                      onConfirm={handleConfirmItem}
+                      onKeep={handleKeep}
+                      onDelete={handleDelete}
+                      onViewDetails={handleViewDetails}
+                    />
+                  ))}
+                </div>
+
+                {pagination.pages > 1 && (
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-slate-800/80">
+                    <div className="text-xs text-slate-400 font-medium">
+                      Showing <span className="text-slate-200 font-semibold">{((pagination.page - 1) * pagination.limit) + 1}</span> to <span className="text-slate-200 font-semibold">{Math.min(pagination.page * pagination.limit, pagination.total)}</span> of <span className="text-slate-200 font-semibold">{pagination.total}</span> memories
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={pagination.page <= 1}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-800 bg-slate-900/80 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white disabled:opacity-40 disabled:pointer-events-none transition"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                        Previous
+                      </button>
+
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: pagination.pages }, (_, i) => i + 1)
+                          .filter((p) => p === 1 || p === pagination.pages || Math.abs(p - pagination.page) <= 1)
+                          .map((p, idx, arr) => {
+                            const prevPageNum = arr[idx - 1];
+                            return (
+                              <React.Fragment key={p}>
+                                {prevPageNum && p - prevPageNum > 1 && (
+                                  <span className="px-1 text-slate-500 text-xs">...</span>
+                                )}
+                                <button
+                                  onClick={() => setPage(p)}
+                                  className={`w-8 h-8 rounded-xl text-xs font-bold transition ${
+                                    p === pagination.page
+                                      ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
+                                      : 'bg-slate-900/80 border border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                                  }`}
+                                >
+                                  {p}
+                                </button>
+                              </React.Fragment>
+                            );
+                          })}
+                      </div>
+
+                      <button
+                        onClick={() => setPage((prev) => Math.min(prev + 1, pagination.pages))}
+                        disabled={pagination.page >= pagination.pages}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-800 bg-slate-900/80 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white disabled:opacity-40 disabled:pointer-events-none transition"
+                      >
+                        Next
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
             ) : (
               <EmptyState
                 icon={Inbox}

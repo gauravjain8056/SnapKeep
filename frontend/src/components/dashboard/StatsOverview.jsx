@@ -1,21 +1,38 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { AlertCircle, Calendar, CheckSquare, Clock } from 'lucide-react';
 
-export const StatsOverview = ({ items = [], onFilterSelect }) => {
-  const now = new Date();
-  const threeDaysFromNow = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+export const StatsOverview = ({ items = [], statsData, onFilterSelect }) => {
+  const stats = useMemo(() => {
+    if (statsData) {
+      return statsData;
+    }
 
-  const criticalCount = items.filter(i => i.priority === 'critical').length;
+    const now = new Date();
+    const threeDaysFromNow = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
 
-  const upcomingDeadlinesCount = items.filter(i => {
-    if (!i.deadline) return false;
-    const d = new Date(i.deadline);
-    return d >= now && d <= threeDaysFromNow;
-  }).length;
+    let criticalCount = 0;
+    let upcomingDeadlinesCount = 0;
+    let needsConfirmCount = 0;
+    let inRetentionCount = 0;
 
-  const needsConfirmCount = items.filter(i => i.needsConfirmation).length;
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.priority === 'critical') criticalCount++;
+      if (item.needsConfirmation) needsConfirmCount++;
+      if (item.retention?.status === 'retention') inRetentionCount++;
+      if (item.deadline) {
+        const d = new Date(item.deadline);
+        if (d >= now && d <= threeDaysFromNow) upcomingDeadlinesCount++;
+      }
+    }
 
-  const inRetentionCount = items.filter(i => i.retention?.status === 'retention').length;
+    return {
+      criticalCount,
+      upcomingDeadlinesCount,
+      needsConfirmCount,
+      inRetentionCount
+    };
+  }, [items, statsData]);
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
@@ -29,7 +46,7 @@ export const StatsOverview = ({ items = [], onFilterSelect }) => {
             <AlertCircle className="w-4 h-4" />
           </div>
         </div>
-        <div className="mt-2 text-2xl font-black text-slate-100">{criticalCount}</div>
+        <div className="mt-2 text-2xl font-black text-slate-100">{stats.criticalCount}</div>
         <p className="text-[11px] text-slate-400 mt-0.5">Mandatory / High stakes</p>
       </button>
 
@@ -43,7 +60,7 @@ export const StatsOverview = ({ items = [], onFilterSelect }) => {
             <Calendar className="w-4 h-4" />
           </div>
         </div>
-        <div className="mt-2 text-2xl font-black text-slate-100">{upcomingDeadlinesCount}</div>
+        <div className="mt-2 text-2xl font-black text-slate-100">{stats.upcomingDeadlinesCount}</div>
         <p className="text-[11px] text-slate-400 mt-0.5">Upcoming deadlines</p>
       </button>
 
@@ -57,7 +74,7 @@ export const StatsOverview = ({ items = [], onFilterSelect }) => {
             <CheckSquare className="w-4 h-4" />
           </div>
         </div>
-        <div className="mt-2 text-2xl font-black text-slate-100">{needsConfirmCount}</div>
+        <div className="mt-2 text-2xl font-black text-slate-100">{stats.needsConfirmCount}</div>
         <p className="text-[11px] text-slate-400 mt-0.5">Ambiguous dates/details</p>
       </button>
 
@@ -71,7 +88,7 @@ export const StatsOverview = ({ items = [], onFilterSelect }) => {
             <Clock className="w-4 h-4" />
           </div>
         </div>
-        <div className="mt-2 text-2xl font-black text-slate-100">{inRetentionCount}</div>
+        <div className="mt-2 text-2xl font-black text-slate-100">{stats.inRetentionCount}</div>
         <p className="text-[11px] text-slate-400 mt-0.5">Eligible for deletion</p>
       </button>
     </div>

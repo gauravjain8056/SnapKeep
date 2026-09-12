@@ -1,7 +1,40 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { z } from 'zod';
+import { Worker } from 'worker_threads';
+import { fileURLToPath } from 'url';
+import path from 'path';
 import { config } from '../../config/env.js';
 import { validateAndSanitize } from './ambiguityDetector.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const BASE64_WORKER_PATH = path.resolve(__dirname, '../../workers/base64Worker.js');
+
+const _geminiClient = config.geminiApiKey
+  ? new GoogleGenerativeAI(config.geminiApiKey)
+  : null;
+
+const _visionModel = _geminiClient
+  ? _geminiClient.getGenerativeModel({
+      model: config.geminiModel || 'gemini-1.5-flash',
+      generationConfig: {
+        responseMimeType: 'application/json',
+        temperature: 0.1
+      }
+    })
+  : null;
+
+function encodeBufferBase64InWorker(buffer) {
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(BASE64_WORKER_PATH, {
+      workerData: { buffer }
+    });
+    worker.once('message', resolve);
+    worker.once('error', reject);
+    worker.once('exit', (code) => {
+      if (code !== 0) reject(new Error(`base64Worker exited with code ${code}`));
+    });
+  });
+}
 
 const singleItemSchema = z.object({
   title: z.string(),
@@ -39,14 +72,7 @@ export async function extractFromScreenshot(imageBuffer, mimeType = 'image/jpeg'
   }
 
   try {
-    const genAI = new GoogleGenerativeAI(config.geminiApiKey);
-    const model = genAI.getGenerativeModel({
-      model: config.geminiModel || 'gemini-1.5-flash',
-      generationConfig: {
-        responseMimeType: 'application/json',
-        temperature: 0.1
-      }
-    });
+    const model = _visionModel;
 
     const prompt = `You are SnapKeep's Vision Extractor for students.
 Extract all distinct actionable memories from this notice/circular screenshot.
@@ -81,9 +107,10 @@ Return JSON:
   ]
 }`;
 
+    const base64Data = await encodeBufferBase64InWorker(imageBuffer);
     const imagePart = {
       inlineData: {
-        data: imageBuffer.toString('base64'),
+        data: base64Data,
         mimeType
       }
     };

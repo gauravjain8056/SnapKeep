@@ -3,6 +3,20 @@ import { z } from 'zod';
 import { config } from '../../config/env.js';
 import { CATEGORIES, PRIORITIES } from '../../models/SnapItem.js';
 
+const _geminiClient = config.geminiApiKey
+  ? new GoogleGenerativeAI(config.geminiApiKey)
+  : null;
+
+const _intentModel = _geminiClient
+  ? _geminiClient.getGenerativeModel({
+      model: config.geminiModel || 'gemini-1.5-flash',
+      generationConfig: {
+        responseMimeType: 'application/json',
+        temperature: 0.0
+      }
+    })
+  : null;
+
 const queryIntentSchema = z.object({
   searchType: z.enum(['structured', 'keyword']),
   category: z.string().nullable().optional(),
@@ -34,14 +48,7 @@ export async function parseIntent(userQuery, userTimezone = 'Asia/Kolkata') {
   }
 
   try {
-    const genAI = new GoogleGenerativeAI(config.geminiApiKey);
-    const model = genAI.getGenerativeModel({
-      model: config.geminiModel || 'gemini-1.5-flash',
-      generationConfig: {
-        responseMimeType: 'application/json',
-        temperature: 0.0
-      }
-    });
+    const model = _intentModel;
 
     const prompt = `Analyze this student natural language question for SnapKeep:
 "${userQuery}"

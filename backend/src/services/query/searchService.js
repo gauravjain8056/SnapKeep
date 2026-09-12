@@ -2,6 +2,21 @@ import mongoose from 'mongoose';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { SnapItem } from '../../models/SnapItem.js';
 import { config } from '../../config/env.js';
+import { qdrantSearch } from '../vector/qdrantService.js';
+
+const _geminiClient = config.geminiApiKey
+  ? new GoogleGenerativeAI(config.geminiApiKey)
+  : null;
+
+const _synthesisModel = _geminiClient
+  ? _geminiClient.getGenerativeModel({
+      model: config.geminiModel || 'gemini-1.5-flash',
+      generationConfig: {
+        temperature: 0.2,
+        maxOutputTokens: 300
+      }
+    })
+  : null;
 
 export async function searchUserItems(userId, queryText, intent, limit = 20) {
   const userObjectId = new mongoose.Types.ObjectId(userId);
@@ -35,17 +50,37 @@ export async function searchUserItems(userId, queryText, intent, limit = 20) {
     ];
   }
 
-  try {
-    const items = await SnapItem.find(baseQuery)
+  const [mongoItems, semanticMongoIds] = await Promise.all([
+    SnapItem.find(baseQuery)
       .sort({ deadline: 1, priority: 1, createdAt: -1 })
       .limit(limit)
-      .lean();
+      .lean()
+      .catch((err) => {
+        console.error('MongoDB search error:', err);
+        return [];
+      }),
+    qdrantSearch(userId, queryText, limit)
+  ]);
 
-    return items;
-  } catch (err) {
-    console.error('Error executing search query:', err);
-    throw err;
+  if (semanticMongoIds.length === 0) {
+    return mongoItems;
   }
+
+  const seenIds = new Set(mongoItems.map((i) => i._id.toString()));
+  const newIds = semanticMongoIds.filter((id) => !seenIds.has(id));
+
+  if (newIds.length === 0) {
+    return mongoItems;
+  }
+
+  const semanticItems = await SnapItem.find({
+    _id: { $in: newIds },
+    userId: userObjectId
+  })
+    .lean()
+    .catch(() => []);
+
+  return [...mongoItems, ...semanticItems];
 }
 
 export async function synthesizeAnswer(userQuery, items) {
@@ -58,14 +93,7 @@ export async function synthesizeAnswer(userQuery, items) {
   }
 
   try {
-    const genAI = new GoogleGenerativeAI(config.geminiApiKey);
-    const model = genAI.getGenerativeModel({
-      model: config.geminiModel || 'gemini-1.5-flash',
-      generationConfig: {
-        temperature: 0.2,
-        maxOutputTokens: 300
-      }
-    });
+    const model = _synthesisModel;
 
     const contextData = items.slice(0, 8).map((item, idx) => ({
       index: idx + 1,

@@ -35,19 +35,25 @@ export async function evaluateItemRetention(userId) {
     ]
   });
 
-  const updatedItems = [];
-  for (const item of activeItems) {
-    const meaningfulDate = item.deadline || item.date;
-    if (meaningfulDate) {
+  const updates = activeItems
+    .map((item) => {
+      const meaningfulDate = item.deadline || item.date;
+      if (!meaningfulDate) return null;
       const expiresAt = new Date(meaningfulDate.getTime() + 7 * 24 * 60 * 60 * 1000);
-      item.retention.status = 'retention';
-      item.retention.expiresAt = expiresAt;
-      await item.save();
-      updatedItems.push(item);
-    }
+      return {
+        updateOne: {
+          filter: { _id: item._id },
+          update: { $set: { 'retention.status': 'retention', 'retention.expiresAt': expiresAt } }
+        }
+      };
+    })
+    .filter(Boolean);
+
+  if (updates.length > 0) {
+    await SnapItem.bulkWrite(updates, { ordered: false });
   }
 
-  return updatedItems;
+  return updates.length;
 }
 
 export async function checkDailyDeletionWarning(user) {
@@ -71,7 +77,11 @@ export async function checkDailyDeletionWarning(user) {
     userId: userDoc._id,
     'retention.status': 'retention',
     'retention.expiresAt': { $ne: null }
-  }).sort({ 'retention.expiresAt': 1 }).limit(10);
+  })
+    .sort({ 'retention.expiresAt': 1 })
+    .limit(10)
+    .select('_id title category retention.expiresAt retention.extendedCount')
+    .lean();
 
   if (expiringItems.length === 0) {
     return null;

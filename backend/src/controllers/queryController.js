@@ -4,6 +4,8 @@ import { searchUserItems, synthesizeAnswer } from '../services/query/searchServi
 import { getQueryCacheKey, cacheGet, cacheSet } from '../services/cache/cacheService.js';
 import { SnapItem } from '../models/SnapItem.js';
 import { ApiResponse } from '../utils/apiResponse.js';
+import { qdrantSearch } from '../services/vector/qdrantService.js';
+import mongoose from 'mongoose';
 
 export async function handleQuery(req, res, next) {
   try {
@@ -34,10 +36,20 @@ export async function handleQuery(req, res, next) {
 
     if (intent.searchType === 'structured') {
       const mongoQuery = buildStructuredQuery(userId, intent, timezone);
-      items = await SnapItem.find(mongoQuery)
-        .sort({ deadline: 1, priority: 1, createdAt: -1 })
-        .limit(20)
-        .lean();
+      const [mongoItems, semanticMongoIds] = await Promise.all([
+        SnapItem.find(mongoQuery)
+          .sort({ deadline: 1, priority: 1, createdAt: -1 })
+          .limit(20)
+          .lean()
+          .catch(() => []),
+        qdrantSearch(userId, cleanQuery, 20)
+      ]);
+      const seenIds = new Set(mongoItems.map((i) => i._id.toString()));
+      const newIds = semanticMongoIds.filter((id) => !seenIds.has(id));
+      const semanticExtras = newIds.length > 0
+        ? await SnapItem.find({ _id: { $in: newIds }, userId: new mongoose.Types.ObjectId(userId) }).lean().catch(() => [])
+        : [];
+      items = [...mongoItems, ...semanticExtras];
     } else {
       items = await searchUserItems(userId, cleanQuery, intent, 20);
     }

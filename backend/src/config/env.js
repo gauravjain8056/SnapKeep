@@ -11,7 +11,11 @@ export const config = {
   jwtRefreshExpiry: process.env.JWT_REFRESH_EXPIRY || '7d',
   geminiApiKey: process.env.GEMINI_API_KEY || '',
   geminiModel: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
+  embeddingModel: process.env.EMBEDDING_MODEL || 'gemini-embedding-001',
   redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',
   clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
-  isProduction: process.env.NODE_ENV === 'production'
+  isProduction: process.env.NODE_ENV === 'production',
+  qdrantUrl: process.env.QDRANT_URL || '',
+  qdrantApiKey: process.env.QDRANT_API_KEY || '',
+  qdrantCollection: process.env.QDRANT_COLLECTION || 'snapkeep_items'
 };

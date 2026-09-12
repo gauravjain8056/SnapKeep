@@ -4,6 +4,7 @@ import { evaluateItemRetention, keepItem as extendItemRetention } from '../servi
 import { getQueryCacheKey, cacheGet, cacheSet, invalidatePattern } from '../services/cache/cacheService.js';
 import { ApiResponse } from '../utils/apiResponse.js';
 import { config } from '../config/env.js';
+import { upsertItemVector, deleteItemVector } from '../services/vector/qdrantService.js';
 
 export async function processScreenshot(req, res, next) {
   try {
@@ -57,6 +58,7 @@ export async function processScreenshot(req, res, next) {
       createdItems.push(snapItem);
     }
 
+    createdItems.forEach((si) => upsertItemVector(si).catch(console.warn));
     await invalidatePattern(`nlq:${req.user.id}:*`);
 
     const anyNeedsConfirmation = createdItems.some((i) => i.needsConfirmation);
@@ -128,13 +130,14 @@ export async function getItems(req, res, next) {
     }
 
     const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
-    const items = await SnapItem.find(filter)
-      .sort(sortOptions)
-      .skip(skip)
-      .limit(parseInt(limit, 10))
-      .lean();
-
-    const total = await SnapItem.countDocuments(filter);
+    const [items, total] = await Promise.all([
+      SnapItem.find(filter)
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(parseInt(limit, 10))
+        .lean(),
+      SnapItem.countDocuments(filter)
+    ]);
 
     return ApiResponse.success(res, {
       items,
@@ -200,6 +203,7 @@ export async function updateItem(req, res, next) {
     }
 
     await item.save();
+    upsertItemVector(item).catch(console.warn);
     await invalidatePattern(`nlq:${req.user.id}:*`);
 
     return ApiResponse.success(res, {
@@ -238,6 +242,7 @@ export async function confirmItem(req, res, next) {
     item.confidence = 1.0;
 
     await item.save();
+    upsertItemVector(item).catch(console.warn);
     await invalidatePattern(`nlq:${req.user.id}:*`);
 
     return ApiResponse.success(res, {
@@ -272,6 +277,7 @@ export async function deleteItem(req, res, next) {
       return ApiResponse.error(res, 'SnapItem not found', 'ITEM_NOT_FOUND', 404);
     }
 
+    deleteItemVector(req.params.id).catch(console.warn);
     await invalidatePattern(`nlq:${req.user.id}:*`);
 
     return ApiResponse.success(res, { message: 'Item deleted successfully' });

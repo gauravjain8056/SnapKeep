@@ -1,12 +1,14 @@
 import app from './app.js';
 import { connectDB } from './config/db.js';
 import { config } from './config/env.js';
+import { bootstrapQdrantCollection } from './config/qdrant.js';
 
 const PORT = config.port;
 const HOST = '0.0.0.0';
 
 async function startServer() {
   await connectDB();
+  bootstrapQdrantCollection();
 
   const server = app.listen(PORT, HOST, () => {
     console.log(`================================================`);

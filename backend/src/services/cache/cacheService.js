@@ -1,7 +1,17 @@
 import crypto from 'crypto';
 import { getRedisClient, isRedisConnected } from '../../config/redis.js';
 
+const MAX_MEM_CACHE_ENTRIES = 500;
 const memoryCache = new Map();
+
+function memCacheSet(key, entry) {
+  if (memoryCache.size >= MAX_MEM_CACHE_ENTRIES) {
+    const oldestKey = memoryCache.keys().next().value;
+    memoryCache.delete(oldestKey);
+  }
+  memoryCache.set(key, entry);
+}
+
 
 function hashKey(str) {
   return crypto.createHash('md5').update(str).digest('hex');
@@ -43,7 +53,7 @@ export async function cacheSet(key, value, ttlSeconds = 600) {
     }
   }
 
-  memoryCache.set(key, {
+  memCacheSet(key, {
     value,
     expiresAt: Date.now() + ttlSeconds * 1000
   });

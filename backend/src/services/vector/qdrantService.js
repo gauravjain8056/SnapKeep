@@ -67,17 +67,32 @@ export async function qdrantSearch(userId, queryText, limit = 20) {
   }
 
   try {
-    const results = await client.search(config.qdrantCollection, {
-      vector,
-      limit,
-      filter: {
-        must: [{ key: 'userId', match: { value: userId.toString() } }]
-      },
-      with_payload: true,
-      score_threshold: 0.3
-    });
-    console.log(`[Qdrant] Search for "${queryText}" yielded ${results.length} hit(s). Scores:`, results.map((r) => r.score.toFixed(3)));
-    return results.map((r) => r.payload.mongoId).filter(Boolean);
+    let points = [];
+    if (typeof client.query === 'function') {
+      const response = await client.query(config.qdrantCollection, {
+        query: vector,
+        limit,
+        filter: {
+          must: [{ key: 'userId', match: { value: userId.toString() } }]
+        },
+        with_payload: true,
+        score_threshold: 0.3
+      });
+      points = response?.points || [];
+    } else if (typeof client.search === 'function') {
+      points = await client.search(config.qdrantCollection, {
+        vector,
+        limit,
+        filter: {
+          must: [{ key: 'userId', match: { value: userId.toString() } }]
+        },
+        with_payload: true,
+        score_threshold: 0.3
+      });
+    }
+
+    console.log(`[Qdrant] Search for "${queryText}" yielded ${points.length} hit(s). Scores:`, points.map((r) => r.score?.toFixed(3)));
+    return points.map((r) => r.payload?.mongoId).filter(Boolean);
   } catch (err) {
     console.warn(`[Qdrant] Search failed, falling back to MongoDB only: ${err.message}`);
     return [];

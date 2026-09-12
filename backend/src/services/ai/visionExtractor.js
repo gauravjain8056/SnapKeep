@@ -107,7 +107,14 @@ Return JSON:
   ]
 }`;
 
-    const base64Data = await encodeBufferBase64InWorker(imageBuffer);
+    let base64Data;
+    try {
+      base64Data = await encodeBufferBase64InWorker(imageBuffer);
+    } catch {
+      base64Data = Buffer.isBuffer(imageBuffer)
+        ? imageBuffer.toString('base64')
+        : Buffer.from(imageBuffer).toString('base64');
+    }
     const imagePart = {
       inlineData: {
         data: base64Data,

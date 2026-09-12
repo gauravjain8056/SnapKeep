@@ -11,11 +11,10 @@ async function startServer() {
   bootstrapQdrantCollection();
 
   const server = app.listen(PORT, HOST, () => {
-    console.log(`================================================`);
-    console.log(`🚀 SnapKeep Backend Server running on http://${HOST}:${PORT}`);
+
+    console.log(`SnapKeep Backend Server running on http://${HOST}:${PORT}`);
     console.log(`Environment: ${config.nodeEnv}`);
     console.log(`Health Endpoint: http://${HOST}:${PORT}/health`);
-    console.log(`================================================`);
   });
 
   const shutdown = () => {

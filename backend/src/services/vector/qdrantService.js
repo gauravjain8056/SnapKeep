@@ -76,7 +76,7 @@ export async function qdrantSearch(userId, queryText, limit = 20) {
           must: [{ key: 'userId', match: { value: userId.toString() } }]
         },
         with_payload: true,
-        score_threshold: 0.3
+        score_threshold: 0.6
       });
       points = response?.points || [];
     } else if (typeof client.search === 'function') {

@@ -13,22 +13,30 @@ export async function upsertItemVector(item) {
   const client = getQdrantClient();
   if (!client) return;
 
-  const vector = await embedItem(item);
-  if (!vector) return;
+  try {
+    const vector = await embedItem(item);
+    if (!vector) {
+      console.warn(`[Qdrant] Failed to generate embedding for item ${item._id}`);
+      return;
+    }
 
-  await client.upsert(config.qdrantCollection, {
-    wait: false,
-    points: [
-      {
-        id: mongoIdToUuid(item._id),
-        vector,
-        payload: {
-          mongoId: item._id.toString(),
-          userId: item.userId.toString()
+    await client.upsert(config.qdrantCollection, {
+      wait: true,
+      points: [
+        {
+          id: mongoIdToUuid(item._id),
+          vector,
+          payload: {
+            mongoId: item._id.toString(),
+            userId: item.userId.toString()
+          }
         }
-      }
-    ]
-  });
+      ]
+    });
+    console.log(`[Qdrant] Indexed vector for item "${item.title}" (${item._id})`);
+  } catch (err) {
+    console.error(`[Qdrant] Failed to upsert vector for item ${item._id}:`, err.message);
+  }
 }
 
 export async function deleteItemVector(mongoId) {
@@ -36,10 +44,15 @@ export async function deleteItemVector(mongoId) {
   const client = getQdrantClient();
   if (!client) return;
 
-  await client.delete(config.qdrantCollection, {
-    wait: false,
-    points: [mongoIdToUuid(mongoId)]
-  });
+  try {
+    await client.delete(config.qdrantCollection, {
+      wait: true,
+      points: [mongoIdToUuid(mongoId)]
+    });
+    console.log(`[Qdrant] Deleted vector for item ${mongoId}`);
+  } catch (err) {
+    console.warn(`[Qdrant] Failed to delete vector for item ${mongoId}:`, err.message);
+  }
 }
 
 export async function qdrantSearch(userId, queryText, limit = 20) {
@@ -48,7 +61,10 @@ export async function qdrantSearch(userId, queryText, limit = 20) {
   if (!client) return [];
 
   const vector = await embedText(queryText, 'RETRIEVAL_QUERY');
-  if (!vector) return [];
+  if (!vector) {
+    console.warn('[Qdrant] Failed to generate query embedding.');
+    return [];
+  }
 
   try {
     const results = await client.search(config.qdrantCollection, {
@@ -58,11 +74,13 @@ export async function qdrantSearch(userId, queryText, limit = 20) {
         must: [{ key: 'userId', match: { value: userId.toString() } }]
       },
       with_payload: true,
-      score_threshold: 0.5
+      score_threshold: 0.3
     });
+    console.log(`[Qdrant] Search for "${queryText}" yielded ${results.length} hit(s). Scores:`, results.map((r) => r.score.toFixed(3)));
     return results.map((r) => r.payload.mongoId).filter(Boolean);
   } catch (err) {
-    console.warn(`Qdrant search failed, falling back to MongoDB only: ${err.message}`);
+    console.warn(`[Qdrant] Search failed, falling back to MongoDB only: ${err.message}`);
     return [];
   }
 }
+

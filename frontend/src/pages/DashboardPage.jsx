@@ -133,10 +133,12 @@ export const DashboardPage = () => {
     setPage(1);
   };
 
-  const handleFilterSelectFromStats = ({ priority: p, dueSoon, needsConfirmation, status: s }) => {
-    if (p) setPriority(p);
-    if (s) setStatus(s);
-    if (needsConfirmation) setNeedsConfirmationOnly(true);
+  const handleFilterSelectFromStats = ({ priority: p, needsConfirmation, status: s }) => {
+    setSearch('');
+    setCategory('all');
+    setPriority(p || 'all');
+    setStatus(s || 'all');
+    setNeedsConfirmationOnly(!!needsConfirmation);
     setPage(1);
   };
 
@@ -278,7 +280,7 @@ export const DashboardPage = () => {
                 icon={Inbox}
                 title="No action memories found"
                 description={
-                  search || category !== 'all' || priority !== 'all' || needsConfirmationOnly
+                  search || category !== 'all' || priority !== 'all' || status !== 'all' || needsConfirmationOnly
                     ? 'No memories match your current filters. Try resetting filters.'
                     : 'Your memory space is clean! Capture your first assignment or notice screenshot.'
                 }

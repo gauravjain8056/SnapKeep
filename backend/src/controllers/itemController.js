@@ -92,6 +92,7 @@ export async function getItems(req, res, next) {
       relevanceCategory,
       status,
       needsConfirmation,
+      dueSoon,
       search,
       sortBy = 'createdAt',
       order = 'desc',
@@ -107,6 +108,11 @@ export async function getItems(req, res, next) {
     if (status) filter['retention.status'] = status;
     if (needsConfirmation !== undefined) {
       filter.needsConfirmation = needsConfirmation === 'true';
+    }
+    if (dueSoon === 'true') {
+      const now = new Date();
+      const threeDaysFromNow = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+      filter.deadline = { $gte: now, $lte: threeDaysFromNow };
     }
 
     if (search) {
@@ -182,7 +188,7 @@ export async function getItems(req, res, next) {
         total,
         page: parseInt(page, 10),
         limit: parseInt(limit, 10),
-        pages: Math.ceil(total / parseInt(limit, 10))
+        pages: Math.max(1, Math.ceil(total / parseInt(limit, 10)))
       }
     });
   } catch (err) {

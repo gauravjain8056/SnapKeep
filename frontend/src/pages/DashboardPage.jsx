@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, RefreshCw, Inbox, ChevronLeft, ChevronRight } from 'lucide-react';
+import { RefreshCw, Inbox, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '../services/api';
 import { DailyWarningBanner } from '../components/dashboard/DailyWarningBanner';
 import { StatsOverview } from '../components/dashboard/StatsOverview';
@@ -28,6 +28,10 @@ export const DashboardPage = () => {
   const [priority, setPriority] = useState('all');
   const [status, setStatus] = useState('all');
   const [needsConfirmationOnly, setNeedsConfirmationOnly] = useState(false);
+  const [dueSoonOnly, setDueSoonOnly] = useState(false);
+  const [relevanceCategory, setRelevanceCategory] = useState('all');
+  const [sortBy, setSortBy] = useState('createdAt');
+  const [order, setOrder] = useState('desc');
 
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 12, pages: 1 });
@@ -49,8 +53,12 @@ export const DashboardPage = () => {
       if (category !== 'all') params.category = category;
       if (priority !== 'all') params.priority = priority;
       if (status !== 'all') params.status = status;
+      if (relevanceCategory !== 'all') params.relevanceCategory = relevanceCategory;
       if (needsConfirmationOnly) params.needsConfirmation = 'true';
+      if (dueSoonOnly) params.dueSoon = 'true';
       if (debouncedSearch.trim()) params.search = debouncedSearch.trim();
+      params.sortBy = sortBy;
+      params.order = order;
 
       const res = await api.get('/api/items', { params });
       if (res.data?.success && res.data?.data) {
@@ -63,9 +71,9 @@ export const DashboardPage = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [category, priority, status, needsConfirmationOnly, debouncedSearch, page]);
+  }, [category, priority, status, relevanceCategory, needsConfirmationOnly, dueSoonOnly, sortBy, order, debouncedSearch, page]);
 
-  useEffect(() => { setPage(1); }, [category, priority, status, needsConfirmationOnly, debouncedSearch]);
+  useEffect(() => { setPage(1); }, [category, priority, status, relevanceCategory, needsConfirmationOnly, dueSoonOnly, sortBy, order, debouncedSearch]);
   useEffect(() => { fetchItems(); }, [fetchItems]);
 
   const handleNaturalSearch = async (queryText) => {
@@ -129,16 +137,24 @@ export const DashboardPage = () => {
     setCategory('all');
     setPriority('all');
     setStatus('all');
+    setRelevanceCategory('all');
     setNeedsConfirmationOnly(false);
+    setDueSoonOnly(false);
+    setSortBy('createdAt');
+    setOrder('desc');
     setPage(1);
   };
 
-  const handleFilterSelectFromStats = ({ priority: p, needsConfirmation, status: s }) => {
+  const handleFilterSelectFromStats = ({ priority: p, needsConfirmation, status: s, dueSoon }) => {
     setSearch('');
     setCategory('all');
     setPriority(p || 'all');
     setStatus(s || 'all');
+    setRelevanceCategory('all');
     setNeedsConfirmationOnly(!!needsConfirmation);
+    setDueSoonOnly(!!dueSoon);
+    setSortBy('createdAt');
+    setOrder('desc');
     setPage(1);
   };
 
@@ -174,8 +190,16 @@ export const DashboardPage = () => {
             setPriority={setPriority}
             status={status}
             setStatus={setStatus}
+            relevanceCategory={relevanceCategory}
+            setRelevanceCategory={setRelevanceCategory}
             needsConfirmationOnly={needsConfirmationOnly}
             setNeedsConfirmationOnly={setNeedsConfirmationOnly}
+            dueSoonOnly={dueSoonOnly}
+            setDueSoonOnly={setDueSoonOnly}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            order={order}
+            setOrder={setOrder}
             onReset={handleResetFilters}
           />
 
@@ -280,7 +304,7 @@ export const DashboardPage = () => {
                 icon={Inbox}
                 title="No action memories found"
                 description={
-                  search || category !== 'all' || priority !== 'all' || status !== 'all' || needsConfirmationOnly
+                  search || category !== 'all' || priority !== 'all' || status !== 'all' || needsConfirmationOnly || dueSoonOnly
                     ? 'No memories match your current filters. Try resetting filters.'
                     : 'Your memory space is clean! Capture your first assignment or notice screenshot.'
                 }
@@ -300,6 +324,7 @@ export const DashboardPage = () => {
           onEdit={(i) => setEditItem(i)}
           onConfirm={(i) => setConfirmItem(i)}
           onKeep={handleKeep}
+          onDelete={(id) => { setDetailItem(null); handleDelete(id); }}
         />
       )}
 

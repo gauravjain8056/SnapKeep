@@ -7,7 +7,8 @@ import {
   BookOpen,
   Bookmark,
   Cpu,
-  MessageSquareQuote
+  MessageSquareQuote,
+  Trash2
 } from 'lucide-react';
 import { Modal } from '../common/Modal';
 import {
@@ -18,7 +19,7 @@ import {
   RetentionBadge
 } from '../common/Badge';
 
-export const ItemDetailModal = ({ item, isOpen, onClose, onEdit, onConfirm, onKeep }) => {
+export const ItemDetailModal = ({ item, isOpen, onClose, onEdit, onConfirm, onKeep, onDelete }) => {
   if (!item) return null;
 
   const isRetention = item.retention?.status === 'retention';
@@ -182,6 +183,16 @@ export const ItemDetailModal = ({ item, isOpen, onClose, onEdit, onConfirm, onKe
             Captured: {new Date(item.createdAt).toLocaleDateString()}
           </span>
           <div className="flex items-center gap-2">
+            {onDelete && (
+              <button
+                onClick={() => {
+                  if (window.confirm(`Delete "${item.title}"?`)) onDelete(item._id);
+                }}
+                className="px-3 py-1.5 bg-red-950 hover:bg-red-900 text-red-300 text-xs font-medium rounded border border-red-900 transition-colors flex items-center gap-1.5"
+              >
+                <Trash2 className="w-3.5 h-3.5" /> Delete
+              </button>
+            )}
             {item.needsConfirmation && (
               <button
                 onClick={() => { onClose(); onConfirm(item); }}

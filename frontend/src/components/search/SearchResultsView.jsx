@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Bot } from 'lucide-react';
+import { ArrowLeft, Bot, Inbox } from 'lucide-react';
 import { ItemCard } from '../dashboard/ItemCard';
 import { EmptyState } from '../common/EmptyState';
 
@@ -99,6 +99,7 @@ export const SearchResultsView = ({
           </div>
         ) : (
           <EmptyState
+            icon={Inbox}
             title="No direct matching items found"
             description="SnapKeep couldn't find any specific saved items matching this query in your account."
           />

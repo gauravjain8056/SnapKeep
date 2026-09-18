@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, RefreshCw, Sparkles, Inbox, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Camera, RefreshCw, Inbox, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '../services/api';
 import { DailyWarningBanner } from '../components/dashboard/DailyWarningBanner';
 import { StatsOverview } from '../components/dashboard/StatsOverview';
@@ -36,7 +36,6 @@ export const DashboardPage = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchResult, setSearchResult] = useState(null);
 
-  const [selectedItem, setSelectedItem] = useState(null);
   const [detailItem, setDetailItem] = useState(null);
   const [editItem, setEditItem] = useState(null);
   const [confirmItem, setConfirmItem] = useState(null);
@@ -46,10 +45,7 @@ export const DashboardPage = () => {
       setIsLoading(true);
       setError('');
 
-      const params = {
-        page,
-        limit: 12
-      };
+      const params = { page, limit: 12 };
       if (category !== 'all') params.category = category;
       if (priority !== 'all') params.priority = priority;
       if (status !== 'all') params.status = status;
@@ -59,12 +55,8 @@ export const DashboardPage = () => {
       const res = await api.get('/api/items', { params });
       if (res.data?.success && res.data?.data) {
         setItems(res.data.data.items || []);
-        if (res.data.data.pagination) {
-          setPagination(res.data.data.pagination);
-        }
-        if (res.data.data.stats) {
-          setStatsData(res.data.data.stats);
-        }
+        if (res.data.data.pagination) setPagination(res.data.data.pagination);
+        if (res.data.data.stats) setStatsData(res.data.data.stats);
       }
     } catch (err) {
       setError(err.response?.data?.error?.message || 'Failed to fetch items');
@@ -73,21 +65,14 @@ export const DashboardPage = () => {
     }
   }, [category, priority, status, needsConfirmationOnly, debouncedSearch, page]);
 
-  useEffect(() => {
-    setPage(1);
-  }, [category, priority, status, needsConfirmationOnly, debouncedSearch]);
-
-  useEffect(() => {
-    fetchItems();
-  }, [fetchItems]);
+  useEffect(() => { setPage(1); }, [category, priority, status, needsConfirmationOnly, debouncedSearch]);
+  useEffect(() => { fetchItems(); }, [fetchItems]);
 
   const handleNaturalSearch = async (queryText) => {
     try {
       setIsSearching(true);
       const res = await api.post('/api/query', { query: queryText });
-      if (res.data?.success && res.data?.data) {
-        setSearchResult(res.data.data);
-      }
+      if (res.data?.success && res.data?.data) setSearchResult(res.data.data);
     } catch (err) {
       alert(err.response?.data?.error?.message || 'AI Search failed');
     } finally {
@@ -103,9 +88,7 @@ export const DashboardPage = () => {
   const handleKeep = useCallback(async (itemId) => {
     try {
       const res = await api.post(`/api/items/${itemId}/keep`);
-      if (res.data?.success) {
-        fetchItems();
-      }
+      if (res.data?.success) fetchItems();
     } catch (err) {
       alert(err.response?.data?.error?.message || 'Failed to extend retention');
     }
@@ -119,14 +102,11 @@ export const DashboardPage = () => {
         setPagination((prev) => ({
           ...prev,
           total: Math.max(0, prev.total - 1),
-          pages: Math.max(1, Math.ceil((prev.total - 1) / prev.limit))
+          pages: Math.max(1, Math.ceil((prev.total - 1) / prev.limit)),
         }));
         setSearchResult((prev) => {
           if (!prev) return null;
-          return {
-            ...prev,
-            items: prev.items.filter((i) => i._id !== itemId)
-          };
+          return { ...prev, items: prev.items.filter((i) => i._id !== itemId) };
         });
       }
     } catch (err) {
@@ -134,30 +114,14 @@ export const DashboardPage = () => {
     }
   }, []);
 
-  const handleEditItem = useCallback((item) => {
-    setEditItem(item);
-  }, []);
-
-  const handleConfirmItem = useCallback((item) => {
-    setConfirmItem(item);
-  }, []);
-
-  const handleViewDetails = useCallback((item) => {
-    setDetailItem(item);
-  }, []);
-
   const handleUpdate = async (itemId, updatedData) => {
     const res = await api.patch(`/api/items/${itemId}`, updatedData);
-    if (res.data?.success) {
-      fetchItems();
-    }
+    if (res.data?.success) fetchItems();
   };
 
   const handleConfirm = async (itemId, confirmedData) => {
     const res = await api.post(`/api/items/${itemId}/confirm`, confirmedData);
-    if (res.data?.success) {
-      fetchItems();
-    }
+    if (res.data?.success) fetchItems();
   };
 
   const handleResetFilters = () => {
@@ -176,6 +140,9 @@ export const DashboardPage = () => {
     setPage(1);
   };
 
+  const paginationBtnBase =
+    'flex items-center gap-1 px-3 py-1.5 rounded-xl border border-purple-900/30 bg-black text-xs font-semibold text-zinc-400 hover:bg-purple-900/20 hover:text-zinc-200 disabled:opacity-40 disabled:pointer-events-none transition';
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <DailyWarningBanner onRefresh={fetchItems} />
@@ -186,11 +153,11 @@ export const DashboardPage = () => {
         <SearchResultsView
           searchResult={searchResult}
           onClearSearch={handleClearSearch}
-          onEdit={handleEditItem}
-          onConfirm={handleConfirmItem}
+          onEdit={setEditItem}
+          onConfirm={setConfirmItem}
           onKeep={handleKeep}
           onDelete={handleDelete}
-          onViewDetails={handleViewDetails}
+          onViewDetails={setDetailItem}
         />
       ) : (
         <>
@@ -212,22 +179,22 @@ export const DashboardPage = () => {
 
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-500">
                 Saved Action Memories ({pagination.total || items.length})
               </h3>
               <button
                 onClick={fetchItems}
                 title="Refresh memories"
-                className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition"
+                className="p-1.5 text-zinc-600 hover:text-zinc-200 hover:bg-white/5 rounded-lg transition"
               >
                 <RefreshCw className="w-4 h-4" />
               </button>
             </div>
 
             {isLoading ? (
-              <LoadingSpinner message="Retrieving your memories..." />
+              <LoadingSpinner message="Retrieving your memories…" />
             ) : error ? (
-              <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm text-center">
+              <div className="p-4 rounded-2xl bg-red-950/30 border border-red-500/25 text-red-300 text-sm text-center">
                 {error}
               </div>
             ) : items.length > 0 ? (
@@ -237,29 +204,37 @@ export const DashboardPage = () => {
                     <ItemCard
                       key={item._id}
                       item={item}
-                      onEdit={handleEditItem}
-                      onConfirm={handleConfirmItem}
+                      onEdit={setEditItem}
+                      onConfirm={setConfirmItem}
                       onKeep={handleKeep}
                       onDelete={handleDelete}
-                      onViewDetails={handleViewDetails}
+                      onViewDetails={setDetailItem}
                     />
                   ))}
                 </div>
 
                 {pagination.pages > 1 && (
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-slate-800/80">
-                    <div className="text-xs text-slate-400 font-medium">
-                      Showing <span className="text-slate-200 font-semibold">{((pagination.page - 1) * pagination.limit) + 1}</span> to <span className="text-slate-200 font-semibold">{Math.min(pagination.page * pagination.limit, pagination.total)}</span> of <span className="text-slate-200 font-semibold">{pagination.total}</span> memories
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-purple-900/20">
+                    <div className="text-xs text-zinc-600 font-medium">
+                      Showing{' '}
+                      <span className="text-zinc-300 font-semibold">
+                        {(pagination.page - 1) * pagination.limit + 1}
+                      </span>{' '}
+                      to{' '}
+                      <span className="text-zinc-300 font-semibold">
+                        {Math.min(pagination.page * pagination.limit, pagination.total)}
+                      </span>{' '}
+                      of{' '}
+                      <span className="text-zinc-300 font-semibold">{pagination.total}</span> memories
                     </div>
 
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
                         disabled={pagination.page <= 1}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-800 bg-slate-900/80 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white disabled:opacity-40 disabled:pointer-events-none transition"
+                        className={paginationBtnBase}
                       >
-                        <ChevronLeft className="w-4 h-4" />
-                        Previous
+                        <ChevronLeft className="w-4 h-4" /> Previous
                       </button>
 
                       <div className="flex items-center gap-1">
@@ -270,14 +245,14 @@ export const DashboardPage = () => {
                             return (
                               <React.Fragment key={p}>
                                 {prevPageNum && p - prevPageNum > 1 && (
-                                  <span className="px-1 text-slate-500 text-xs">...</span>
+                                  <span className="px-1 text-zinc-600 text-xs">…</span>
                                 )}
                                 <button
                                   onClick={() => setPage(p)}
                                   className={`w-8 h-8 rounded-xl text-xs font-bold transition ${
                                     p === pagination.page
-                                      ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-                                      : 'bg-slate-900/80 border border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                                      ? 'bg-purple-700 text-white shadow-lg shadow-purple-700/30'
+                                      : 'bg-black border border-purple-900/30 text-zinc-500 hover:bg-purple-900/20 hover:text-zinc-200'
                                   }`}
                                 >
                                   {p}
@@ -290,10 +265,9 @@ export const DashboardPage = () => {
                       <button
                         onClick={() => setPage((prev) => Math.min(prev + 1, pagination.pages))}
                         disabled={pagination.page >= pagination.pages}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-slate-800 bg-slate-900/80 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white disabled:opacity-40 disabled:pointer-events-none transition"
+                        className={paginationBtnBase}
                       >
-                        Next
-                        <ChevronRight className="w-4 h-4" />
+                        Next <ChevronRight className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -305,7 +279,7 @@ export const DashboardPage = () => {
                 title="No action memories found"
                 description={
                   search || category !== 'all' || priority !== 'all' || needsConfirmationOnly
-                    ? 'No memories match your current active filters. Try resetting filters.'
+                    ? 'No memories match your current filters. Try resetting filters.'
                     : 'Your memory space is clean! Capture your first assignment or notice screenshot.'
                 }
                 actionLabel="Capture Screenshot"

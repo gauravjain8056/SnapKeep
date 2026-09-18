@@ -1,11 +1,10 @@
-import React, { useMemo } from 'react';
+import React from 'react';
+import { useMemo } from 'react';
 import { AlertCircle, Calendar, CheckSquare, Clock } from 'lucide-react';
 
 export const StatsOverview = ({ items = [], statsData, onFilterSelect }) => {
   const stats = useMemo(() => {
-    if (statsData) {
-      return statsData;
-    }
+    if (statsData) return statsData;
 
     const now = new Date();
     const threeDaysFromNow = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
@@ -26,71 +25,72 @@ export const StatsOverview = ({ items = [], statsData, onFilterSelect }) => {
       }
     }
 
-    return {
-      criticalCount,
-      upcomingDeadlinesCount,
-      needsConfirmCount,
-      inRetentionCount
-    };
+    return { criticalCount, upcomingDeadlinesCount, needsConfirmCount, inRetentionCount };
   }, [items, statsData]);
+
+  const cards = [
+    {
+      label: 'Critical',
+      value: stats.criticalCount,
+      sub: 'Mandatory / High stakes',
+      icon: AlertCircle,
+      color: 'text-red-400',
+      bg: 'bg-red-500/10',
+      border: 'border-red-500/20 hover:border-red-500/40',
+      onClick: () => onFilterSelect({ priority: 'critical' }),
+    },
+    {
+      label: 'Next 3 Days',
+      value: stats.upcomingDeadlinesCount,
+      sub: 'Upcoming deadlines',
+      icon: Calendar,
+      color: 'text-purple-400',
+      bg: 'bg-purple-500/10',
+      border: 'border-purple-500/20 hover:border-purple-500/40',
+      onClick: () => onFilterSelect({ dueSoon: true }),
+    },
+    {
+      label: 'Confirm',
+      value: stats.needsConfirmCount,
+      sub: 'Ambiguous dates/details',
+      icon: CheckSquare,
+      color: 'text-amber-400',
+      bg: 'bg-amber-500/10',
+      border: 'border-amber-500/20 hover:border-amber-500/40',
+      onClick: () => onFilterSelect({ needsConfirmation: true }),
+    },
+    {
+      label: 'Expiring',
+      value: stats.inRetentionCount,
+      sub: 'Eligible for deletion',
+      icon: Clock,
+      color: 'text-red-400',
+      bg: 'bg-red-500/10',
+      border: 'border-red-500/20 hover:border-red-500/40',
+      onClick: () => onFilterSelect({ status: 'retention' }),
+    },
+  ];
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
-      <button
-        onClick={() => onFilterSelect({ priority: 'critical' })}
-        className="glass-card text-left p-4 rounded-2xl border border-rose-500/20 hover:border-rose-500/40 hover:bg-slate-900/80 transition group"
-      >
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-rose-400 uppercase tracking-wider">Critical</span>
-          <div className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400 group-hover:scale-110 transition">
-            <AlertCircle className="w-4 h-4" />
+      {cards.map((card) => (
+        <button
+          key={card.label}
+          onClick={card.onClick}
+          className={`glass-card text-left p-4 rounded-2xl border ${card.border} transition group`}
+        >
+          <div className="flex items-center justify-between">
+            <span className={`text-xs font-bold uppercase tracking-wider ${card.color}`}>
+              {card.label}
+            </span>
+            <div className={`p-1.5 rounded-lg ${card.bg} ${card.color} group-hover:scale-110 transition`}>
+              <card.icon className="w-4 h-4" />
+            </div>
           </div>
-        </div>
-        <div className="mt-2 text-2xl font-black text-slate-100">{stats.criticalCount}</div>
-        <p className="text-[11px] text-slate-400 mt-0.5">Mandatory / High stakes</p>
-      </button>
-
-      <button
-        onClick={() => onFilterSelect({ dueSoon: true })}
-        className="glass-card text-left p-4 rounded-2xl border border-blue-500/20 hover:border-blue-500/40 hover:bg-slate-900/80 transition group"
-      >
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-blue-400 uppercase tracking-wider">Next 3 Days</span>
-          <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 group-hover:scale-110 transition">
-            <Calendar className="w-4 h-4" />
-          </div>
-        </div>
-        <div className="mt-2 text-2xl font-black text-slate-100">{stats.upcomingDeadlinesCount}</div>
-        <p className="text-[11px] text-slate-400 mt-0.5">Upcoming deadlines</p>
-      </button>
-
-      <button
-        onClick={() => onFilterSelect({ needsConfirmation: true })}
-        className="glass-card text-left p-4 rounded-2xl border border-amber-500/20 hover:border-amber-500/40 hover:bg-slate-900/80 transition group"
-      >
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-amber-400 uppercase tracking-wider">Confirm</span>
-          <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 group-hover:scale-110 transition">
-            <CheckSquare className="w-4 h-4" />
-          </div>
-        </div>
-        <div className="mt-2 text-2xl font-black text-slate-100">{stats.needsConfirmCount}</div>
-        <p className="text-[11px] text-slate-400 mt-0.5">Ambiguous dates/details</p>
-      </button>
-
-      <button
-        onClick={() => onFilterSelect({ status: 'retention' })}
-        className="glass-card text-left p-4 rounded-2xl border border-red-500/20 hover:border-red-500/40 hover:bg-slate-900/80 transition group"
-      >
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-red-400 uppercase tracking-wider">Expiring</span>
-          <div className="p-1.5 rounded-lg bg-red-500/10 text-red-400 group-hover:scale-110 transition">
-            <Clock className="w-4 h-4" />
-          </div>
-        </div>
-        <div className="mt-2 text-2xl font-black text-slate-100">{stats.inRetentionCount}</div>
-        <p className="text-[11px] text-slate-400 mt-0.5">Eligible for deletion</p>
-      </button>
+          <div className="mt-2 text-2xl font-black text-white">{card.value}</div>
+          <p className="text-[11px] text-zinc-500 mt-0.5">{card.sub}</p>
+        </button>
+      ))}
     </div>
   );
 };

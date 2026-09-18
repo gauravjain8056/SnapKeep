@@ -8,8 +8,8 @@ import { LoadingSpinner } from '../components/common/LoadingSpinner';
 
 export const RetentionPage = () => {
   const navigate = useNavigate();
-  const [items, setItems] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [items, setItems]                   = useState([]);
+  const [isLoading, setIsLoading]           = useState(true);
   const [isExtendingAll, setIsExtendingAll] = useState(false);
 
   const fetchExpiringItems = async () => {
@@ -26,9 +26,7 @@ export const RetentionPage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchExpiringItems();
-  }, []);
+  useEffect(() => { fetchExpiringItems(); }, []);
 
   const handleKeep = async (itemId) => {
     try {
@@ -46,7 +44,7 @@ export const RetentionPage = () => {
         await api.post(`/api/items/${item._id}/keep`);
       }
       fetchExpiringItems();
-    } catch (err) {
+    } catch {
       alert('Failed to extend all items');
     } finally {
       setIsExtendingAll(false);
@@ -68,14 +66,17 @@ export const RetentionPage = () => {
         <div>
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 transition mb-2"
+            className="flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-300 transition mb-2"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
           </button>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-100 flex items-center gap-3">
-            Expiring Items (7-Day Retention)
+          <h2 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-3">
+            Expiring Items
+            <span className="text-xs px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 font-mono">
+              7-Day Retention
+            </span>
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-xl">
+          <p className="text-xs sm:text-sm text-zinc-500 mt-1 max-w-xl">
             Items whose meaningful dates have passed enter a 7-day retention period before deletion. Use KEEP to extend retention by 7 days.
           </p>
         </div>
@@ -84,21 +85,19 @@ export const RetentionPage = () => {
           <button
             onClick={handleKeepAll}
             disabled={isExtendingAll}
-            className="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs sm:text-sm rounded-xl transition shadow-lg shadow-amber-500/20 flex items-center gap-2"
+            className="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs sm:text-sm rounded-xl transition shadow-lg shadow-amber-500/20 flex items-center gap-2"
           >
             {isExtendingAll ? (
               <RefreshCw className="w-4 h-4 animate-spin" />
             ) : (
-              <>
-                <Bookmark className="w-4 h-4" /> KEEP All Items (+7 Days)
-              </>
+              <><Bookmark className="w-4 h-4" /> KEEP All Items (+7 Days)</>
             )}
           </button>
         )}
       </div>
 
       {isLoading ? (
-        <LoadingSpinner message="Checking expiring items..." />
+        <LoadingSpinner message="Checking expiring items…" />
       ) : items.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.map((item) => (

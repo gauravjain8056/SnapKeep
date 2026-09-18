@@ -1,8 +1,8 @@
 import React from 'react';
-import { Search, Filter, RotateCcw } from 'lucide-react';
+import { Search, RotateCcw } from 'lucide-react';
 
 const CATEGORIES = [
-  { id: 'all', label: 'All Categories' },
+  { id: 'all', label: 'All' },
   { id: 'assignment', label: 'Assignments' },
   { id: 'exam', label: 'Exams' },
   { id: 'payment', label: 'Payments' },
@@ -13,8 +13,11 @@ const CATEGORIES = [
   { id: 'opportunity', label: 'Opportunities' },
   { id: 'announcement', label: 'Announcements' },
   { id: 'task', label: 'Tasks' },
-  { id: 'other', label: 'Other' }
+  { id: 'other', label: 'Other' },
 ];
+
+const selectClass =
+  'bg-black/70 border border-purple-900/40 hover:border-purple-700/50 focus:border-purple-500 rounded-xl px-3 py-2 text-xs font-medium text-zinc-300 focus:outline-none transition cursor-pointer';
 
 export const ItemFilterBar = ({
   search,
@@ -27,44 +30,39 @@ export const ItemFilterBar = ({
   setStatus,
   needsConfirmationOnly,
   setNeedsConfirmationOnly,
-  onReset
+  onReset,
 }) => {
+  const hasActiveFilter =
+    search || category !== 'all' || priority !== 'all' || status !== 'all' || needsConfirmationOnly;
+
   return (
-    <div className="glass-panel p-4 rounded-2xl border border-slate-800 mb-6 space-y-3">
+    <div className="glass-panel p-4 rounded-2xl border border-purple-900/30 mb-6 space-y-3">
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-        {/* Search input */}
+        {/* Search */}
         <div className="relative flex-1">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-purple-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search saved titles, subjects, actions..."
-            className="w-full pl-9 pr-4 py-2 bg-slate-900/90 border border-slate-800 focus:border-blue-500 rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
+            placeholder="Search titles, subjects, actions..."
+            className="w-full pl-9 pr-4 py-2 bg-black/70 border border-purple-900/40 hover:border-purple-700/50 focus:border-purple-500 rounded-xl text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-purple-500/40 transition"
           />
         </div>
 
-        {/* Priority Filter */}
-        <select
-          value={priority}
-          onChange={(e) => setPriority(e.target.value)}
-          className="bg-slate-900/90 border border-slate-800 focus:border-blue-500 rounded-xl px-3 py-2 text-xs font-medium text-slate-300 focus:outline-none"
-        >
+        {/* Priority */}
+        <select value={priority} onChange={(e) => setPriority(e.target.value)} className={selectClass}>
           <option value="all">All Priorities</option>
           <option value="critical">🔴 Critical</option>
           <option value="important">🟡 Important</option>
           <option value="informational">🔵 Informational</option>
         </select>
 
-        {/* Status Filter */}
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="bg-slate-900/90 border border-slate-800 focus:border-blue-500 rounded-xl px-3 py-2 text-xs font-medium text-slate-300 focus:outline-none"
-        >
+        {/* Status */}
+        <select value={status} onChange={(e) => setStatus(e.target.value)} className={selectClass}>
           <option value="all">All Statuses</option>
-          <option value="active">Active Memories</option>
-          <option value="retention">In Retention (Expiring)</option>
+          <option value="active">Active</option>
+          <option value="retention">Expiring</option>
         </select>
 
         {/* Needs Confirmation Toggle */}
@@ -72,27 +70,27 @@ export const ItemFilterBar = ({
           onClick={() => setNeedsConfirmationOnly(!needsConfirmationOnly)}
           className={`px-3 py-2 rounded-xl text-xs font-semibold border transition shrink-0 ${
             needsConfirmationOnly
-              ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-              : 'bg-slate-900/80 text-slate-400 border-slate-800 hover:text-slate-200'
+              ? 'bg-amber-500/15 text-amber-300 border-amber-500/40'
+              : 'bg-black/50 text-zinc-500 border-purple-900/30 hover:text-zinc-200 hover:border-purple-700/40'
           }`}
         >
           ⚠️ Needs Confirm
         </button>
 
-        {/* Reset button */}
-        {(search || category !== 'all' || priority !== 'all' || status !== 'all' || needsConfirmationOnly) && (
+        {/* Reset */}
+        {hasActiveFilter && (
           <button
             onClick={onReset}
             title="Reset filters"
-            className="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition"
+            className="p-2 text-zinc-500 hover:text-zinc-200 hover:bg-white/5 rounded-xl transition"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
         )}
       </div>
 
-      {/* Category Pills (Horizontal scroll on mobile) */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs pt-1 no-scrollbar">
+      {/* Category Pills */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
         {CATEGORIES.map((cat) => {
           const isSelected = category === cat.id;
           return (
@@ -101,8 +99,8 @@ export const ItemFilterBar = ({
               onClick={() => setCategory(cat.id)}
               className={`px-3 py-1 rounded-full whitespace-nowrap font-medium transition ${
                 isSelected
-                  ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/25'
-                  : 'bg-slate-900/60 text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 border border-slate-800/60'
+                  ? 'bg-purple-700 text-white shadow-md shadow-purple-700/25'
+                  : 'bg-black/40 text-zinc-500 hover:text-zinc-200 hover:bg-purple-900/20 border border-purple-900/20 hover:border-purple-700/30'
               }`}
             >
               {cat.label}

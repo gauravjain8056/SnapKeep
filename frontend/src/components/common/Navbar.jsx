@@ -10,21 +10,22 @@ export const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/80 backdrop-blur-md">
+    <nav className="sticky top-0 z-40 border-b border-purple-900/40 bg-black/90 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
+
           {/* Brand Logo */}
           <div className="flex items-center gap-8">
-            <Link to="/" className="flex items-center gap-2 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition">
-                <Sparkles className="w-5 h-5" />
+            <Link to="/" className="flex items-center gap-2.5 group">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-700 via-purple-600 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-purple-700/30 group-hover:scale-105 transition">
+                <Sparkles className="w-4.5 h-4.5" />
               </div>
-              <div className="flex flex-col">
-                <span className="text-lg font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
+              <div className="flex flex-col leading-none">
+                <span className="text-lg font-black tracking-tight text-white">
                   SnapKeep
                 </span>
-                <span className="text-[10px] uppercase font-semibold text-blue-400 tracking-wider -mt-1">
-                  AI Action Memory
+                <span className="text-[10px] uppercase font-bold text-purple-400 tracking-widest">
+                  AI Memory
                 </span>
               </div>
             </Link>
@@ -35,8 +36,8 @@ export const Navbar = () => {
                 to="/"
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                   isActive('/')
-                    ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-900'
+                    ? 'bg-purple-700/20 text-purple-300 border border-purple-600/30'
+                    : 'text-zinc-400 hover:text-white hover:bg-white/5'
                 }`}
               >
                 <LayoutDashboard className="w-4 h-4" />
@@ -46,8 +47,8 @@ export const Navbar = () => {
                 to="/capture"
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                   isActive('/capture')
-                    ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-900'
+                    ? 'bg-purple-700/20 text-purple-300 border border-purple-600/30'
+                    : 'text-zinc-400 hover:text-white hover:bg-white/5'
                 }`}
               >
                 <Camera className="w-4 h-4" />
@@ -57,8 +58,8 @@ export const Navbar = () => {
                 to="/retention"
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                   isActive('/retention')
-                    ? 'bg-red-500/15 text-red-400 border border-red-500/30'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-900'
+                    ? 'bg-red-900/20 text-red-400 border border-red-500/30'
+                    : 'text-zinc-400 hover:text-white hover:bg-white/5'
                 }`}
               >
                 <Clock className="w-4 h-4" />
@@ -71,20 +72,20 @@ export const Navbar = () => {
           <div className="flex items-center gap-3">
             <Link
               to="/capture"
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white transition shadow-md shadow-blue-600/20"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-purple-700 hover:bg-purple-600 text-white transition shadow-lg shadow-purple-700/30"
             >
               <Camera className="w-4 h-4" />
-              <span>Snap Screenshot</span>
+              <span>Snap</span>
             </Link>
 
-            <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-slate-800 text-xs text-slate-400">
-              <span className="truncate max-w-[160px] font-mono">{user?.email}</span>
+            <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-purple-900/50 text-xs text-zinc-500">
+              <span className="truncate max-w-[150px] font-mono">{user?.email}</span>
             </div>
 
             <button
               onClick={logout}
               title="Log out"
-              className="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition"
+              className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition"
             >
               <LogOut className="w-4 h-4" />
             </button>

@@ -7,8 +7,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "vitest run",
-    "backfill:qdrant": "node src/scripts/backfillQdrant.js"
+    "test": "vitest run"
   },
   "dependencies": {
     "@google/genai": "^2.22.0",

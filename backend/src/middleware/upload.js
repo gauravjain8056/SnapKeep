@@ -1,7 +1,14 @@
 import multer from 'multer';
+import os from 'os';
 import { ApiResponse } from '../utils/apiResponse.js';
 
-const storage = multer.memoryStorage();
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, os.tmpdir()),
+  filename: (_req, file, cb) => {
+    const ext = file.originalname.split('.').pop() || 'bin';
+    cb(null, `sk-upload-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`);
+  }
+});
 
 const fileFilter = (req, file, cb) => {
   const allowedMimeTypes = [

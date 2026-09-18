@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Upload, Sparkles, AlertCircle, FileText, CheckCircle, ArrowLeft } from 'lucide-react';
+import imageCompression from 'browser-image-compression';
 import api from '../services/api';
 import { ItemCard } from '../components/dashboard/ItemCard';
 import { ConfirmModal } from '../components/items/ConfirmModal';
@@ -13,6 +14,7 @@ export const CapturePage = () => {
   const [selectedFile, setSelectedFile]   = useState(null);
   const [previewUrl, setPreviewUrl]       = useState(null);
   const [caption, setCaption]             = useState('');
+  const [isCompressing, setIsCompressing] = useState(false);
   const [isProcessing, setIsProcessing]   = useState(false);
   const [extractedItems, setExtractedItems] = useState([]);
   const [error, setError]                 = useState('');
@@ -54,10 +56,24 @@ export const CapturePage = () => {
       return;
     }
     setError('');
+    setIsCompressing(true);
+    let fileToUpload;
+    try {
+      fileToUpload = await imageCompression(selectedFile, {
+        maxSizeMB: 2,
+        maxWidthOrHeight: 2048,
+        useWebWorker: true,
+        fileType: selectedFile.type || 'image/jpeg'
+      });
+    } catch {
+      fileToUpload = selectedFile;
+    } finally {
+      setIsCompressing(false);
+    }
     setIsProcessing(true);
     try {
       const formData = new FormData();
-      formData.append('image', selectedFile);
+      formData.append('image', fileToUpload, selectedFile.name);
       formData.append('caption', caption);
       const res = await api.post('/api/items/process', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -138,8 +154,19 @@ export const CapturePage = () => {
         </div>
       )}
 
-      {/* Processing State */}
-      {isProcessing ? (
+      {/* Compressing / Processing / Results */}
+      {isCompressing ? (
+        <div className="bg-zinc-950 p-8 rounded-lg border border-zinc-800 max-w-md mx-auto my-12 text-center space-y-4">
+          <div className="w-12 h-12 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 mx-auto">
+            <Upload className="w-6 h-6" />
+          </div>
+          <div className="space-y-1">
+            <h4 className="text-base font-semibold text-white">Compressing Image…</h4>
+            <p className="text-xs text-zinc-400">Optimising screenshot before secure upload.</p>
+          </div>
+          <div className="w-6 h-6 border-2 border-zinc-800 border-t-zinc-500 rounded-full animate-spin mx-auto mt-2" />
+        </div>
+      ) : isProcessing ? (
         <div className="bg-zinc-950 p-8 rounded-lg border border-zinc-800 max-w-md mx-auto my-12 text-center space-y-4">
           <div className="w-12 h-12 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-blue-400 mx-auto">
             <Sparkles className="w-6 h-6" />
@@ -150,9 +177,8 @@ export const CapturePage = () => {
           </div>
           <div className="w-6 h-6 border-2 border-zinc-800 border-t-blue-500 rounded-full animate-spin mx-auto mt-2" />
         </div>
-
-      /* Extracted Results */
       ) : extractedItems.length > 0 ? (
+
         <div className="bg-zinc-950 p-6 rounded-lg border border-zinc-800 space-y-5">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
@@ -292,7 +318,7 @@ export const CapturePage = () => {
 
             <button
               onClick={handleProcess}
-              disabled={!selectedFile || isProcessing}
+              disabled={!selectedFile || isCompressing || isProcessing}
               className="w-full py-2.5 bg-blue-800 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium rounded transition-colors flex items-center justify-center gap-2 mt-3"
             >
               <Sparkles className="w-4 h-4" />

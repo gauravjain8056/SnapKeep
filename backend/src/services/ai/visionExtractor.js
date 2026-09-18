@@ -1,39 +1,23 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI, createPartFromUri } from '@google/genai';
 import { z } from 'zod';
-import { Worker } from 'worker_threads';
-import { fileURLToPath } from 'url';
-import path from 'path';
+import fs from 'fs/promises';
 import { config } from '../../config/env.js';
 import { validateAndSanitize } from './ambiguityDetector.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const BASE64_WORKER_PATH = path.resolve(__dirname, '../../workers/base64Worker.js');
-
-const _geminiClient = config.geminiApiKey
-  ? new GoogleGenerativeAI(config.geminiApiKey)
+const _genAI = config.geminiApiKey
+  ? new GoogleGenAI({ apiKey: config.geminiApiKey })
   : null;
 
-const _visionModel = _geminiClient
-  ? _geminiClient.getGenerativeModel({
-      model: config.geminiModel || 'gemini-1.5-flash',
-      generationConfig: {
-        responseMimeType: 'application/json',
-        temperature: 0.1
-      }
-    })
-  : null;
-
-function encodeBufferBase64InWorker(buffer) {
-  return new Promise((resolve, reject) => {
-    const worker = new Worker(BASE64_WORKER_PATH, {
-      workerData: { buffer }
+async function deleteGeminiFile(fileName) {
+  if (!_genAI || !fileName) return;
+  try {
+    await _genAI.apiClient.request({
+      path: `v1beta/${fileName}`,
+      httpMethod: 'DELETE',
+      body: null
     });
-    worker.once('message', resolve);
-    worker.once('error', reject);
-    worker.once('exit', (code) => {
-      if (code !== 0) reject(new Error(`base64Worker exited with code ${code}`));
-    });
-  });
+  } catch {
+  }
 }
 
 const singleItemSchema = z.object({
@@ -65,16 +49,13 @@ const singleItemSchema = z.object({
   confirmationReason: z.string().nullable().optional()
 });
 
-export async function extractFromScreenshot(imageBuffer, mimeType = 'image/jpeg', userCaption = '') {
+export async function extractFromScreenshot(tempFilePath, mimeType = 'image/jpeg', userCaption = '') {
   if (!config.geminiApiKey) {
     console.warn('GEMINI_API_KEY is not set. Using mock multi-item extraction for local testing.');
     return generateMockExtraction(userCaption);
   }
 
-  try {
-    const model = _visionModel;
-
-    const prompt = `You are SnapKeep's Vision Extractor for students.
+  const prompt = `You are SnapKeep's Vision Extractor for students.
 Extract all distinct actionable memories from this notice/circular screenshot.
 
 Context provided by student: "${userCaption || 'None'}"
@@ -107,23 +88,25 @@ Return JSON:
   ]
 }`;
 
-    let base64Data;
-    try {
-      base64Data = await encodeBufferBase64InWorker(imageBuffer);
-    } catch {
-      base64Data = Buffer.isBuffer(imageBuffer)
-        ? imageBuffer.toString('base64')
-        : Buffer.from(imageBuffer).toString('base64');
-    }
-    const imagePart = {
-      inlineData: {
-        data: base64Data,
-        mimeType
-      }
-    };
+  let geminiFileName = null;
 
-    const result = await model.generateContent([prompt, imagePart]);
-    const responseText = result.response.text();
+  try {
+    const uploadedFile = await _genAI.apiClient.uploadFile(tempFilePath, { mimeType });
+    geminiFileName = uploadedFile.name;
+
+    const model = _genAI.models;
+    const imagePart = createPartFromUri(uploadedFile.uri, mimeType);
+
+    const result = await model.generateContent({
+      model: config.geminiModel || 'gemini-1.5-flash',
+      contents: [{ role: 'user', parts: [{ text: prompt }, imagePart] }],
+      generationConfig: {
+        responseMimeType: 'application/json',
+        temperature: 0.1
+      }
+    });
+
+    const responseText = result.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
 
     let parsedJson;
     try {
@@ -171,6 +154,9 @@ Return JSON:
         confirmationReason: `Vision parser encountered an issue: ${error.message}`
       }, userCaption)
     ];
+  } finally {
+    await deleteGeminiFile(geminiFileName);
+    await fs.unlink(tempFilePath).catch(() => {});
   }
 }
 

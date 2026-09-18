@@ -9,7 +9,7 @@ import mongoose from 'mongoose';
 
 export async function processScreenshot(req, res, next) {
   try {
-    if (!req.file || !req.file.buffer) {
+    if (!req.file || !req.file.path) {
       return ApiResponse.error(res, 'No screenshot image uploaded', 'MISSING_IMAGE', 400);
     }
 
@@ -19,7 +19,7 @@ export async function processScreenshot(req, res, next) {
     console.log(`Extracting circular memories for user ${req.user.id}. Caption: "${userCaption}"`);
 
     const extractedItems = await extractFromScreenshot(
-      req.file.buffer,
+      req.file.path,
       mimeType,
       userCaption
     );

@@ -35,8 +35,8 @@ export const StatsOverview = ({ items = [], statsData, onFilterSelect }) => {
       sub: 'Mandatory / High stakes',
       icon: AlertCircle,
       color: 'text-red-400',
-      bg: 'bg-red-500/10',
-      border: 'border-red-500/20 hover:border-red-500/40',
+      bg: 'bg-red-950/60',
+      border: 'border-zinc-800 hover:border-red-900',
       onClick: () => onFilterSelect({ priority: 'critical' }),
     },
     {
@@ -44,19 +44,19 @@ export const StatsOverview = ({ items = [], statsData, onFilterSelect }) => {
       value: stats.upcomingDeadlinesCount,
       sub: 'Upcoming deadlines',
       icon: Calendar,
-      color: 'text-purple-400',
-      bg: 'bg-purple-500/10',
-      border: 'border-purple-500/20 hover:border-purple-500/40',
+      color: 'text-blue-400',
+      bg: 'bg-blue-950/60',
+      border: 'border-zinc-800 hover:border-blue-900',
       onClick: () => onFilterSelect({ dueSoon: true }),
     },
     {
-      label: 'Confirm',
+      label: 'Needs Review',
       value: stats.needsConfirmCount,
-      sub: 'Ambiguous dates/details',
+      sub: 'Ambiguous fields',
       icon: CheckSquare,
-      color: 'text-amber-400',
-      bg: 'bg-amber-500/10',
-      border: 'border-amber-500/20 hover:border-amber-500/40',
+      color: 'text-zinc-300',
+      bg: 'bg-zinc-900',
+      border: 'border-zinc-800 hover:border-zinc-700',
       onClick: () => onFilterSelect({ needsConfirmation: true }),
     },
     {
@@ -65,8 +65,8 @@ export const StatsOverview = ({ items = [], statsData, onFilterSelect }) => {
       sub: 'Eligible for deletion',
       icon: Clock,
       color: 'text-red-400',
-      bg: 'bg-red-500/10',
-      border: 'border-red-500/20 hover:border-red-500/40',
+      bg: 'bg-red-950/60',
+      border: 'border-zinc-800 hover:border-red-900',
       onClick: () => onFilterSelect({ status: 'retention' }),
     },
   ];
@@ -77,18 +77,18 @@ export const StatsOverview = ({ items = [], statsData, onFilterSelect }) => {
         <button
           key={card.label}
           onClick={card.onClick}
-          className={`glass-card text-left p-4 rounded-2xl border ${card.border} transition group`}
+          className={`bg-zinc-950 text-left p-4 rounded-lg border ${card.border} transition-colors`}
         >
           <div className="flex items-center justify-between">
-            <span className={`text-xs font-bold uppercase tracking-wider ${card.color}`}>
+            <span className={`text-xs font-semibold uppercase tracking-wider ${card.color}`}>
               {card.label}
             </span>
-            <div className={`p-1.5 rounded-lg ${card.bg} ${card.color} group-hover:scale-110 transition`}>
+            <div className={`p-1.5 rounded ${card.bg} ${card.color}`}>
               <card.icon className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-2 text-2xl font-black text-white">{card.value}</div>
-          <p className="text-[11px] text-zinc-500 mt-0.5">{card.sub}</p>
+          <div className="mt-2 text-2xl font-bold text-white">{card.value}</div>
+          <p className="text-xs text-zinc-400 mt-0.5">{card.sub}</p>
         </button>
       ))}
     </div>

@@ -44,17 +44,17 @@ export const ItemCard = React.memo(({ item, onEdit, onConfirm, onKeep, onDelete,
   return (
     <div
       onClick={() => onViewDetails && onViewDetails(item)}
-      className={`group relative glass-card p-5 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between ${
+      className={`group relative p-4 rounded-lg border transition-colors cursor-pointer flex flex-col justify-between ${
         item.needsConfirmation
-          ? 'border-amber-500/30 bg-amber-950/10'
+          ? 'border-zinc-700 bg-zinc-950'
           : isRetention
-          ? 'border-red-500/25 bg-red-950/10'
-          : 'border-purple-900/20 hover:border-purple-700/40'
+          ? 'border-red-950 bg-red-950/20'
+          : 'border-zinc-800 hover:border-zinc-700 bg-zinc-950'
       }`}
     >
       <div>
         {/* Top Badges */}
-        <div className="flex flex-wrap items-center gap-1.5 mb-3">
+        <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
           <CategoryBadge category={item.category} />
           <PriorityBadge priority={item.priority} />
           {item.relevanceCategory && item.relevanceCategory !== 'general' && (
@@ -73,30 +73,30 @@ export const ItemCard = React.memo(({ item, onEdit, onConfirm, onKeep, onDelete,
 
         {/* Title & Subject */}
         <div className="mb-2">
-          <h4 className="text-base font-bold text-zinc-100 group-hover:text-purple-300 transition leading-snug line-clamp-2">
+          <h4 className="text-sm font-semibold text-white group-hover:text-blue-400 transition-colors leading-snug line-clamp-2">
             {item.title}
           </h4>
           {item.subject && (
-            <span className="inline-block text-xs font-semibold text-zinc-500 mt-1 bg-white/5 px-2 py-0.5 rounded-md">
-              📚 {item.subject}
+            <span className="inline-block text-xs text-zinc-400 mt-1 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded">
+              {item.subject}
             </span>
           )}
         </div>
 
         {/* User Context Caption */}
         {item.originalCaption && (
-          <div className="mb-2.5 text-[11px] text-zinc-500 italic flex items-center gap-1.5 bg-white/3 px-2.5 py-1.5 rounded-lg border border-purple-900/20">
-            <MessageSquareQuote className="w-3.5 h-3.5 text-purple-700 shrink-0 not-italic" />
+          <div className="mb-2 text-xs text-zinc-400 italic flex items-center gap-1.5 bg-black px-2.5 py-1.5 rounded border border-zinc-800">
+            <MessageSquareQuote className="w-3.5 h-3.5 text-zinc-500 shrink-0 not-italic" />
             <span className="truncate">"{item.originalCaption}"</span>
           </div>
         )}
 
         {/* Action / Next Step */}
         {item.action && (
-          <div className="mb-3.5 p-2.5 rounded-xl bg-purple-700/8 border border-purple-700/20 text-xs text-purple-300 flex items-start gap-2">
-            <CheckCircle className="w-4 h-4 text-purple-500 shrink-0 mt-0.5" />
+          <div className="mb-2.5 p-2 rounded bg-blue-950/40 border border-blue-900/50 text-xs text-blue-200 flex items-start gap-2">
+            <CheckCircle className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
             <div>
-              <span className="font-semibold block text-[11px] uppercase tracking-wider text-purple-500">Action:</span>
+              <span className="font-medium block text-[11px] uppercase tracking-wider text-blue-400">Action:</span>
               <span className="leading-tight">{item.action}</span>
             </div>
           </div>
@@ -104,23 +104,23 @@ export const ItemCard = React.memo(({ item, onEdit, onConfirm, onKeep, onDelete,
 
         {/* Ambiguity Reason Banner */}
         {item.needsConfirmation && item.confirmationReason && (
-          <div className="mb-3 p-2.5 rounded-xl bg-amber-500/8 border border-amber-500/20 text-xs text-amber-300 flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-            <span className="leading-tight text-[11px]">{item.confirmationReason}</span>
+          <div className="mb-2.5 p-2 rounded bg-zinc-900 border border-zinc-700 text-xs text-zinc-300 flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 text-zinc-400 shrink-0 mt-0.5" />
+            <span className="leading-tight text-xs">{item.confirmationReason}</span>
           </div>
         )}
 
         {/* Description Snippet */}
         {item.description && (
-          <p className="text-xs text-zinc-500 line-clamp-2 mb-3 leading-relaxed">
+          <p className="text-xs text-zinc-400 line-clamp-2 mb-2 leading-relaxed">
             {item.description}
           </p>
         )}
       </div>
 
       {/* Footer */}
-      <div className="pt-3 border-t border-purple-900/20 mt-2">
-        <div className="flex items-center justify-between text-xs text-zinc-500 mb-3">
+      <div className="pt-2.5 border-t border-zinc-800 mt-2">
+        <div className="flex items-center justify-between text-xs text-zinc-400 mb-2.5">
           {item.deadline ? (
             <div className={`flex items-center gap-1.5 font-medium ${isOverdue ? 'text-red-400' : 'text-zinc-300'}`}>
               <Calendar className="w-3.5 h-3.5" />
@@ -130,7 +130,7 @@ export const ItemCard = React.memo(({ item, onEdit, onConfirm, onKeep, onDelete,
                   month: 'short', day: 'numeric', year: 'numeric'
                 })}
               </span>
-              {item.time && <span className="text-[11px] text-zinc-600">({item.time})</span>}
+              {item.time && <span className="text-[11px] text-zinc-500">({item.time})</span>}
             </div>
           ) : item.date ? (
             <div className="flex items-center gap-1.5 text-zinc-400 font-medium">
@@ -140,16 +140,16 @@ export const ItemCard = React.memo(({ item, onEdit, onConfirm, onKeep, onDelete,
                   month: 'short', day: 'numeric', year: 'numeric'
                 })}
               </span>
-              {item.time && <span className="text-[11px] text-zinc-600">({item.time})</span>}
+              {item.time && <span className="text-[11px] text-zinc-500">({item.time})</span>}
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 text-zinc-600 text-[11px]">
+            <div className="flex items-center gap-1.5 text-zinc-500 text-xs">
               <Clock className="w-3.5 h-3.5" />
               <span>No fixed date</span>
             </div>
           )}
 
-          <span className="text-[10px] text-zinc-700 font-mono">
+          <span className="text-[10px] text-zinc-500 font-mono">
             {Math.round((item.confidence || 1) * 100)}% conf
           </span>
         </div>
@@ -161,7 +161,7 @@ export const ItemCard = React.memo(({ item, onEdit, onConfirm, onKeep, onDelete,
               <button
                 onClick={handleKeep}
                 disabled={isKeeping}
-                className="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/35 transition flex items-center gap-1"
+                className="px-2 py-1 rounded text-xs font-medium bg-blue-950 hover:bg-blue-900 text-blue-200 border border-blue-800 transition-colors flex items-center gap-1"
               >
                 {isKeeping ? (
                   <RefreshCw className="w-3 h-3 animate-spin" />
@@ -174,9 +174,9 @@ export const ItemCard = React.memo(({ item, onEdit, onConfirm, onKeep, onDelete,
             {item.needsConfirmation && (
               <button
                 onClick={(e) => { e.stopPropagation(); onConfirm(item); }}
-                className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-purple-700 hover:bg-purple-600 text-white transition shadow-sm"
+                className="px-2 py-1 rounded text-xs font-medium bg-blue-800 hover:bg-blue-700 text-white transition-colors"
               >
-                Confirm Details
+                Review
               </button>
             )}
           </div>
@@ -185,7 +185,7 @@ export const ItemCard = React.memo(({ item, onEdit, onConfirm, onKeep, onDelete,
             <button
               onClick={(e) => { e.stopPropagation(); onEdit(item); }}
               title="Edit memory"
-              className="p-1.5 text-zinc-600 hover:text-zinc-200 hover:bg-white/5 rounded-lg transition"
+              className="p-1 text-zinc-400 hover:text-white hover:bg-zinc-900 rounded transition-colors"
             >
               <Edit2 className="w-3.5 h-3.5" />
             </button>
@@ -193,7 +193,7 @@ export const ItemCard = React.memo(({ item, onEdit, onConfirm, onKeep, onDelete,
               onClick={handleDelete}
               disabled={isDeleting}
               title="Delete memory"
-              className="p-1.5 text-zinc-600 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
+              className="p-1 text-zinc-400 hover:text-red-400 hover:bg-zinc-900 rounded transition-colors"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>

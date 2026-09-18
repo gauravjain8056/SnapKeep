@@ -3,12 +3,12 @@ import { AlertTriangle, CheckCircle } from 'lucide-react';
 import { Modal } from '../common/Modal';
 
 const inputClass =
-  'w-full px-3 py-2 bg-black/70 border border-purple-900/40 focus:border-purple-500 rounded-xl text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-purple-500/30 transition';
+  'w-full px-3 py-1.5 bg-black border border-zinc-800 focus:border-blue-600 rounded text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none transition-colors';
 
-const labelClass = 'block text-xs font-semibold text-zinc-400 mb-1';
+const labelClass = 'block text-xs font-medium text-zinc-400 mb-1';
 
 const selectClass =
-  'w-full px-3 py-2 bg-black/70 border border-purple-900/40 focus:border-purple-500 rounded-xl text-xs text-zinc-200 focus:outline-none transition capitalize cursor-pointer';
+  'w-full px-2.5 py-1.5 bg-black border border-zinc-800 focus:border-blue-600 rounded text-xs text-zinc-200 focus:outline-none transition-colors capitalize cursor-pointer';
 
 export const ConfirmModal = ({ item, isOpen, onClose, onConfirmed }) => {
   if (!item) return null;
@@ -52,22 +52,22 @@ export const ConfirmModal = ({ item, isOpen, onClose, onConfirmed }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Confirm & Verify Ambiguous Details" maxWidth="max-w-lg">
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <Modal isOpen={isOpen} onClose={onClose} title="Review & Confirm Details" maxWidth="max-w-lg">
+      <form onSubmit={handleSubmit} className="space-y-3.5">
         {/* Ambiguity Notice */}
-        <div className="p-3.5 rounded-xl bg-amber-500/8 border border-amber-500/25 text-amber-300 text-xs flex items-start gap-2.5">
-          <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+        <div className="p-3 rounded bg-zinc-900 border border-zinc-700 text-xs text-zinc-300 flex items-start gap-2.5">
+          <AlertTriangle className="w-4 h-4 text-zinc-400 shrink-0 mt-0.5" />
           <div>
-            <p className="font-semibold text-amber-200">AI Ambiguity Notice:</p>
-            <p className="mt-0.5 leading-relaxed">
+            <p className="font-semibold text-zinc-200">Date Verification Needed:</p>
+            <p className="mt-0.5 leading-relaxed text-zinc-400">
               {item.confirmationReason ||
-                'The AI detected relative or uncertain dates in this screenshot. Please set or verify the exact calendar dates below.'}
+                'Relative or uncertain dates were detected in this screenshot. Please set or verify the exact calendar dates below.'}
             </p>
           </div>
         </div>
 
         {error && (
-          <div className="p-3 rounded-xl bg-red-950/30 border border-red-500/25 text-red-300 text-xs">
+          <div className="p-2.5 rounded bg-red-950/60 border border-red-900 text-red-300 text-xs">
             {error}
           </div>
         )}
@@ -88,7 +88,7 @@ export const ConfirmModal = ({ item, isOpen, onClose, onConfirmed }) => {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2.5">
           <div>
             <label className={labelClass}>Exact Deadline Date</label>
             <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className={inputClass} />
@@ -105,7 +105,7 @@ export const ConfirmModal = ({ item, isOpen, onClose, onConfirmed }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2.5">
           <div>
             <label className={labelClass}>Category</label>
             <select value={category} onChange={(e) => setCategory(e.target.value)} className={selectClass}>
@@ -132,23 +132,23 @@ export const ConfirmModal = ({ item, isOpen, onClose, onConfirmed }) => {
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-2 pt-4 border-t border-purple-900/20">
+        <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-800">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold text-zinc-500 hover:text-zinc-200 rounded-xl transition"
+            className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white rounded transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white text-xs font-semibold rounded-xl transition flex items-center gap-1.5 shadow-md shadow-purple-800/30"
+            className="px-3.5 py-1.5 bg-blue-800 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-medium rounded transition-colors flex items-center gap-1.5"
           >
             {isSubmitting ? (
               <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
-              <><CheckCircle className="w-4 h-4" /> Confirm & Save</>
+              <><CheckCircle className="w-4 h-4" /> Save Details</>
             )}
           </button>
         </div>

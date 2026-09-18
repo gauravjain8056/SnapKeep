@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { Modal } from '../common/Modal';
 
 const inputClass =
-  'w-full px-3 py-2 bg-black/70 border border-purple-900/40 focus:border-purple-500 rounded-xl text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-purple-500/30 transition';
+  'w-full px-3 py-1.5 bg-black border border-zinc-800 focus:border-blue-600 rounded text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none transition-colors';
 
-const labelClass = 'block text-xs font-semibold text-zinc-400 mb-1';
+const labelClass = 'block text-xs font-medium text-zinc-400 mb-1';
 
 const selectClass =
-  'w-full px-3 py-2 bg-black/70 border border-purple-900/40 focus:border-purple-500 rounded-xl text-xs text-zinc-200 focus:outline-none transition capitalize cursor-pointer';
+  'w-full px-2.5 py-1.5 bg-black border border-zinc-800 focus:border-blue-600 rounded text-xs text-zinc-200 focus:outline-none transition-colors capitalize cursor-pointer';
 
 export const EditItemModal = ({ item, isOpen, onClose, onUpdated }) => {
   if (!item) return null;
@@ -55,9 +55,9 @@ export const EditItemModal = ({ item, isOpen, onClose, onUpdated }) => {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Edit Memory Details" maxWidth="max-w-xl">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3.5">
         {error && (
-          <div className="p-3 rounded-xl bg-red-950/30 border border-red-500/25 text-red-300 text-xs">
+          <div className="p-2.5 rounded bg-red-950/60 border border-red-900 text-red-300 text-xs">
             {error}
           </div>
         )}
@@ -72,7 +72,7 @@ export const EditItemModal = ({ item, isOpen, onClose, onUpdated }) => {
           <input type="text" name="action" value={formData.action} onChange={handleChange} className={inputClass} />
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2.5">
           <div>
             <label className={labelClass}>Category</label>
             <select name="category" value={formData.category} onChange={handleChange} className={selectClass}>
@@ -99,7 +99,7 @@ export const EditItemModal = ({ item, isOpen, onClose, onUpdated }) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2.5">
           <div>
             <label className={labelClass}>Subject</label>
             <input type="text" name="subject" value={formData.subject} onChange={handleChange} placeholder="e.g. CS201" className={inputClass} />
@@ -119,7 +119,7 @@ export const EditItemModal = ({ item, isOpen, onClose, onUpdated }) => {
           <textarea name="description" rows="2" value={formData.description} onChange={handleChange} className={inputClass} />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2.5">
           <div>
             <label className={labelClass}>Personal Relevance</label>
             <input type="text" name="relevance" value={formData.relevance} onChange={handleChange} className={inputClass} />
@@ -130,18 +130,18 @@ export const EditItemModal = ({ item, isOpen, onClose, onUpdated }) => {
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-2 pt-4 border-t border-purple-900/20">
+        <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-800">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold text-zinc-500 hover:text-zinc-200 rounded-xl transition"
+            className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white rounded transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white text-xs font-semibold rounded-xl transition shadow-md shadow-purple-800/30"
+            className="px-3.5 py-1.5 bg-blue-800 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-medium rounded transition-colors"
           >
             {isSubmitting ? 'Saving…' : 'Save Changes'}
           </button>

@@ -27,16 +27,16 @@ export const DailyWarningBanner = ({ onRefresh }) => {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-950/30 via-black to-black border border-amber-500/25 p-5 mb-6 shadow-xl animate-fadeIn">
+    <div className="rounded-lg bg-zinc-950 border border-red-900/80 p-4 mb-6">
       <div className="flex items-start justify-between gap-4">
-        <div className="flex items-start gap-3.5">
-          <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/25 shrink-0">
+        <div className="flex items-start gap-3">
+          <div className="p-2 rounded bg-red-950/80 text-red-400 border border-red-900 shrink-0">
             <AlertTriangle className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h4 className="text-sm font-bold text-amber-200">Daily Retention Notice</h4>
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 font-semibold border border-amber-500/25">
+              <h4 className="text-sm font-semibold text-white">Daily Retention Notice</h4>
+              <span className="text-xs px-2 py-0.5 rounded bg-red-950 text-red-300 font-medium border border-red-900">
                 {dailyWarning.count} {dailyWarning.count === 1 ? 'item' : 'items'} expiring soon
               </span>
             </div>
@@ -44,23 +44,23 @@ export const DailyWarningBanner = ({ onRefresh }) => {
               The meaningful dates for these saved items have passed. In accordance with SnapKeep's privacy lifecycle, items are scheduled for automatic deletion unless you choose to KEEP them.
             </p>
 
-            <div className="mt-3.5 flex flex-wrap gap-2">
+            <div className="mt-3 flex flex-wrap gap-2">
               {dailyWarning.items.map((item) => {
                 const isKept = keptIds.has(item.id);
                 return (
                   <div
                     key={item.id}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/60 border border-purple-900/30 text-xs text-zinc-200"
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded bg-black border border-zinc-800 text-xs text-zinc-200"
                   >
-                    <Clock className="w-3.5 h-3.5 text-amber-400" />
+                    <Clock className="w-3.5 h-3.5 text-zinc-400" />
                     <span className="font-medium truncate max-w-[200px]">{item.title}</span>
                     <button
                       onClick={(e) => handleKeep(item.id, e)}
                       disabled={isKept || keepingId === item.id}
-                      className={`ml-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold transition border ${
+                      className={`ml-1 px-2 py-0.5 rounded text-xs font-medium transition-colors border ${
                         isKept
-                          ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/25'
-                          : 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/35'
+                          ? 'bg-zinc-900 text-zinc-300 border-zinc-700'
+                          : 'bg-blue-950 hover:bg-blue-900 text-blue-200 border border-blue-800'
                       }`}
                     >
                       {isKept ? (
@@ -83,7 +83,7 @@ export const DailyWarningBanner = ({ onRefresh }) => {
         <button
           onClick={dismissWarning}
           title="Dismiss notice"
-          className="p-1.5 text-zinc-600 hover:text-zinc-300 hover:bg-white/5 rounded-lg transition shrink-0"
+          className="p-1 text-zinc-400 hover:text-white hover:bg-zinc-900 rounded transition-colors shrink-0"
         >
           <X className="w-4 h-4" />
         </button>

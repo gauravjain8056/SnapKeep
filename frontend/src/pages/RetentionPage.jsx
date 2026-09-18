@@ -62,21 +62,21 @@ export const RetentionPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-300 transition mb-2"
+            className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white transition-colors mb-2"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
           </button>
-          <h2 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-3">
             Expiring Items
-            <span className="text-xs px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 font-mono">
+            <span className="text-xs px-2.5 py-0.5 rounded bg-red-950 text-red-400 border border-red-900 font-mono">
               7-Day Retention
             </span>
           </h2>
-          <p className="text-xs sm:text-sm text-zinc-500 mt-1 max-w-xl">
+          <p className="text-xs text-zinc-400 mt-1 max-w-xl">
             Items whose meaningful dates have passed enter a 7-day retention period before deletion. Use KEEP to extend retention by 7 days.
           </p>
         </div>
@@ -85,7 +85,7 @@ export const RetentionPage = () => {
           <button
             onClick={handleKeepAll}
             disabled={isExtendingAll}
-            className="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs sm:text-sm rounded-xl transition shadow-lg shadow-amber-500/20 flex items-center gap-2"
+            className="px-3.5 py-2 bg-blue-800 hover:bg-blue-700 disabled:opacity-50 text-white font-medium text-xs sm:text-sm rounded transition-colors flex items-center gap-2"
           >
             {isExtendingAll ? (
               <RefreshCw className="w-4 h-4 animate-spin" />

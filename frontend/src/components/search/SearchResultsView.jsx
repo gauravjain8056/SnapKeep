@@ -17,55 +17,55 @@ export const SearchResultsView = ({
   const { query, answer, items = [], intent, fromCache } = searchResult;
 
   return (
-    <div className="mb-10 space-y-6 animate-fadeIn">
+    <div className="mb-10 space-y-6">
       <div className="flex items-center justify-between">
         <button
           onClick={onClearSearch}
-          className="flex items-center gap-2 text-xs font-semibold text-zinc-500 hover:text-white px-3 py-1.5 rounded-xl bg-black border border-purple-900/30 hover:border-purple-700/40 transition"
+          className="flex items-center gap-2 text-xs font-medium text-zinc-400 hover:text-white px-3 py-1.5 rounded bg-black border border-zinc-800 hover:border-zinc-700 transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
         </button>
 
-        <div className="flex items-center gap-2 text-[11px] text-zinc-500">
+        <div className="flex items-center gap-2 text-xs text-zinc-400">
           {fromCache && (
-            <span className="px-2 py-0.5 rounded-md bg-emerald-500/8 text-emerald-400 border border-emerald-500/20 font-mono">
-              ⚡ Cached
+            <span className="px-2 py-0.5 rounded bg-zinc-900 text-zinc-300 border border-zinc-800 font-mono">
+              Cached
             </span>
           )}
-          <span className="px-2 py-0.5 rounded-md bg-purple-700/10 text-purple-400 border border-purple-700/20 font-mono">
+          <span className="px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-900 font-mono">
             {intent?.searchType === 'structured' ? 'Structured Filter' : 'Keyword Search'}
           </span>
         </div>
       </div>
 
       {/* AI Answer Box */}
-      <div className="p-6 rounded-3xl bg-gradient-to-br from-purple-950/30 via-black/90 to-black border border-purple-700/30 shadow-2xl relative overflow-hidden purple-glow">
-        <div className="flex items-start gap-4">
-          <div className="p-3 rounded-2xl bg-purple-700/15 border border-purple-700/30 text-purple-400 shrink-0">
-            <Bot className="w-6 h-6" />
+      <div className="p-5 rounded-lg bg-zinc-950 border border-blue-900/60 relative">
+        <div className="flex items-start gap-3.5">
+          <div className="p-2 rounded bg-blue-950 text-blue-400 shrink-0">
+            <Bot className="w-5 h-5" />
           </div>
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-bold uppercase tracking-wider text-purple-400">SnapKeep AI Answer</span>
-              <span className="text-xs text-zinc-600 font-mono">for "{query}"</span>
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-xs font-semibold uppercase tracking-wider text-blue-400">Summary Answer</span>
+              <span className="text-xs text-zinc-400">for "{query}"</span>
             </div>
-            <p className="text-sm sm:text-base text-zinc-200 leading-relaxed font-normal whitespace-pre-line">
+            <p className="text-sm text-zinc-200 leading-relaxed font-normal whitespace-pre-line">
               {answer}
             </p>
 
             {intent && (
-              <div className="mt-4 pt-3 border-t border-purple-900/30 flex flex-wrap items-center gap-2 text-[11px] text-zinc-500">
-                <span className="text-zinc-600 font-mono">Intent:</span>
-                <span className="px-2 py-0.5 rounded-md bg-white/4 border border-purple-900/30 font-semibold capitalize text-zinc-300">
+              <div className="mt-3 pt-3 border-t border-zinc-800 flex flex-wrap items-center gap-2 text-xs text-zinc-400">
+                <span className="text-zinc-500">Query intent:</span>
+                <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 capitalize text-zinc-300">
                   {intent.searchType} search
                 </span>
                 {intent.category && (
-                  <span className="px-2 py-0.5 rounded-md bg-white/4 border border-purple-900/30 capitalize text-zinc-300">
+                  <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 capitalize text-zinc-300">
                     Category: {intent.category}
                   </span>
                 )}
                 {intent.dateRangeType && intent.dateRangeType !== 'none' && (
-                  <span className="px-2 py-0.5 rounded-md bg-white/4 border border-purple-900/30 text-zinc-300">
+                  <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300">
                     Range: {intent.dateRangeType.replace('_', ' ')}
                   </span>
                 )}
@@ -77,9 +77,9 @@ export const SearchResultsView = ({
 
       {/* Results */}
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-400">
-            Retrieved Saved Items ({items.length})
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+            Matching Items ({items.length})
           </h3>
         </div>
 

@@ -20,16 +20,16 @@ export const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-2xl'
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
       <div className="fixed inset-0" onClick={onClose} />
       <div
-        className={`relative w-full ${maxWidth} glass-panel rounded-2xl p-6 shadow-2xl border border-purple-900/50 bg-black/95 max-h-[90vh] overflow-y-auto z-10 animate-slideUp`}
+        className={`relative w-full ${maxWidth} bg-zinc-950 border border-zinc-800 rounded-lg p-6 shadow-2xl max-h-[90vh] overflow-y-auto z-10`}
       >
-        <div className="flex items-center justify-between pb-4 mb-4 border-b border-purple-900/30">
-          <h3 className="text-lg font-bold text-white">{title}</h3>
+        <div className="flex items-center justify-between pb-4 mb-4 border-b border-zinc-800">
+          <h3 className="text-base font-semibold text-white">{title}</h3>
           <button
             onClick={onClose}
-            className="p-1 text-zinc-500 hover:text-zinc-200 hover:bg-white/5 rounded-lg transition-colors"
+            className="p-1 text-zinc-400 hover:text-white hover:bg-zinc-900 rounded transition-colors"
           >
             <X className="w-5 h-5" />
           </button>

@@ -141,7 +141,7 @@ export const DashboardPage = () => {
   };
 
   const paginationBtnBase =
-    'flex items-center gap-1 px-3 py-1.5 rounded-xl border border-purple-900/30 bg-black text-xs font-semibold text-zinc-400 hover:bg-purple-900/20 hover:text-zinc-200 disabled:opacity-40 disabled:pointer-events-none transition';
+    'flex items-center gap-1 px-3 py-1.5 rounded border border-zinc-800 bg-black text-xs font-medium text-zinc-400 hover:bg-zinc-900 hover:text-white disabled:opacity-40 disabled:pointer-events-none transition-colors';
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -178,14 +178,14 @@ export const DashboardPage = () => {
           />
 
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-500">
-                Saved Action Memories ({pagination.total || items.length})
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                Saved Memories ({pagination.total || items.length})
               </h3>
               <button
                 onClick={fetchItems}
                 title="Refresh memories"
-                className="p-1.5 text-zinc-600 hover:text-zinc-200 hover:bg-white/5 rounded-lg transition"
+                className="p-1 text-zinc-400 hover:text-white hover:bg-zinc-900 rounded transition-colors"
               >
                 <RefreshCw className="w-4 h-4" />
               </button>
@@ -194,7 +194,7 @@ export const DashboardPage = () => {
             {isLoading ? (
               <LoadingSpinner message="Retrieving your memories…" />
             ) : error ? (
-              <div className="p-4 rounded-2xl bg-red-950/30 border border-red-500/25 text-red-300 text-sm text-center">
+              <div className="p-3 rounded bg-red-950/60 border border-red-900 text-red-300 text-sm text-center">
                 {error}
               </div>
             ) : items.length > 0 ? (
@@ -214,18 +214,18 @@ export const DashboardPage = () => {
                 </div>
 
                 {pagination.pages > 1 && (
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-purple-900/20">
-                    <div className="text-xs text-zinc-600 font-medium">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-5 border-t border-zinc-800">
+                    <div className="text-xs text-zinc-400 font-medium">
                       Showing{' '}
-                      <span className="text-zinc-300 font-semibold">
+                      <span className="text-zinc-200 font-semibold">
                         {(pagination.page - 1) * pagination.limit + 1}
                       </span>{' '}
                       to{' '}
-                      <span className="text-zinc-300 font-semibold">
+                      <span className="text-zinc-200 font-semibold">
                         {Math.min(pagination.page * pagination.limit, pagination.total)}
                       </span>{' '}
                       of{' '}
-                      <span className="text-zinc-300 font-semibold">{pagination.total}</span> memories
+                      <span className="text-zinc-200 font-semibold">{pagination.total}</span> memories
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -249,10 +249,10 @@ export const DashboardPage = () => {
                                 )}
                                 <button
                                   onClick={() => setPage(p)}
-                                  className={`w-8 h-8 rounded-xl text-xs font-bold transition ${
+                                  className={`w-7 h-7 rounded text-xs font-medium transition-colors ${
                                     p === pagination.page
-                                      ? 'bg-purple-700 text-white shadow-lg shadow-purple-700/30'
-                                      : 'bg-black border border-purple-900/30 text-zinc-500 hover:bg-purple-900/20 hover:text-zinc-200'
+                                      ? 'bg-blue-800 text-white'
+                                      : 'bg-black border border-zinc-800 text-zinc-400 hover:bg-zinc-900 hover:text-white'
                                   }`}
                                 >
                                   {p}

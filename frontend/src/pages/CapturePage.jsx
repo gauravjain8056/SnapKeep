@@ -110,21 +110,21 @@ export const CapturePage = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-300 transition mb-2"
+            className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white transition-colors mb-2"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
           </button>
-          <h2 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-3">
             Capture Memory
-            <span className="text-xs px-2.5 py-1 rounded-full bg-purple-700/15 text-purple-400 border border-purple-700/25 font-mono">
+            <span className="text-xs px-2.5 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-900 font-mono">
               Zero-Storage Ephemeral
             </span>
           </h2>
-          <p className="text-xs sm:text-sm text-zinc-500 mt-1 max-w-xl">
+          <p className="text-xs text-zinc-400 mt-1 max-w-xl">
             Upload assignment circulars, fee notices, or messages. SnapKeep extracts all actionable items and discards the screenshot immediately.
           </p>
         </div>
@@ -132,43 +132,43 @@ export const CapturePage = () => {
 
       {/* Error */}
       {error && (
-        <div className="mb-6 p-4 rounded-2xl bg-red-950/30 border border-red-500/25 text-red-300 text-xs flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+        <div className="mb-6 p-3 rounded bg-red-950/60 border border-red-900 text-red-300 text-xs flex items-start gap-2.5">
+          <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
           <p className="leading-relaxed">{error}</p>
         </div>
       )}
 
       {/* Processing State */}
       {isProcessing ? (
-        <div className="glass-panel p-10 rounded-3xl border border-purple-700/30 shadow-2xl max-w-md mx-auto my-12 text-center space-y-4 animate-fadeIn purple-glow">
-          <div className="w-14 h-14 rounded-2xl bg-purple-700/15 border border-purple-700/30 flex items-center justify-center text-purple-400 mx-auto">
-            <Sparkles className="w-7 h-7 animate-pulse" />
+        <div className="bg-zinc-950 p-8 rounded-lg border border-zinc-800 max-w-md mx-auto my-12 text-center space-y-4">
+          <div className="w-12 h-12 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-blue-400 mx-auto">
+            <Sparkles className="w-6 h-6" />
           </div>
           <div className="space-y-1">
-            <h4 className="text-base font-bold text-white">Processing Screenshot…</h4>
-            <p className="text-xs text-zinc-500">Extracting deadlines, topics, and actions from the image.</p>
+            <h4 className="text-base font-semibold text-white">Processing Screenshot…</h4>
+            <p className="text-xs text-zinc-400">Extracting deadlines, topics, and actions from the image.</p>
           </div>
-          <div className="w-6 h-6 border-2 border-purple-900/30 border-t-purple-500 rounded-full animate-spin mx-auto mt-2" />
+          <div className="w-6 h-6 border-2 border-zinc-800 border-t-blue-500 rounded-full animate-spin mx-auto mt-2" />
         </div>
 
       /* Extracted Results */
       ) : extractedItems.length > 0 ? (
-        <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-purple-700/30 shadow-2xl animate-fadeIn space-y-6">
+        <div className="bg-zinc-950 p-6 rounded-lg border border-zinc-800 space-y-5">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-3 rounded-2xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
-                <CheckCircle className="w-6 h-6" />
+              <div className="p-2 rounded bg-zinc-900 text-blue-400 border border-zinc-800">
+                <CheckCircle className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">
-                  {extractedItems.length} Structured Memory Item{extractedItems.length > 1 ? 's' : ''} Extracted!
+                <h3 className="text-base font-semibold text-white">
+                  {extractedItems.length} Structured Memory Item{extractedItems.length > 1 ? 's' : ''} Extracted
                 </h3>
-                <p className="text-xs text-zinc-500">Original screenshot permanently discarded from memory.</p>
+                <p className="text-xs text-zinc-400">Original screenshot was permanently discarded from memory.</p>
               </div>
             </div>
             <button
               onClick={handleReset}
-              className="px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 text-xs font-semibold border border-purple-900/30 transition"
+              className="px-3 py-1.5 rounded bg-black hover:bg-zinc-900 text-zinc-300 text-xs font-medium border border-zinc-800 transition-colors"
             >
               Snap Another
             </button>
@@ -187,10 +187,10 @@ export const CapturePage = () => {
             ))}
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-purple-900/20">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-800">
             <button
               onClick={() => navigate('/')}
-              className="px-5 py-2.5 bg-purple-700 hover:bg-purple-600 text-white text-xs sm:text-sm font-bold rounded-xl transition shadow-lg shadow-purple-800/30"
+              className="px-4 py-2 bg-blue-800 hover:bg-blue-700 text-white text-xs font-medium rounded transition-colors"
             >
               Go to Dashboard
             </button>
@@ -206,10 +206,10 @@ export const CapturePage = () => {
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`relative border-2 border-dashed rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-center text-center cursor-pointer transition min-h-[300px] ${
+              className={`relative border border-dashed rounded-lg p-6 sm:p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-colors min-h-[280px] ${
                 previewUrl
-                  ? 'border-purple-700/50 bg-purple-950/10'
-                  : 'border-purple-900/30 hover:border-purple-700/50 bg-black/50 hover:bg-purple-950/10'
+                  ? 'border-blue-800 bg-zinc-950'
+                  : 'border-zinc-800 hover:border-zinc-700 bg-black hover:bg-zinc-950'
               }`}
             >
               <input
@@ -224,23 +224,23 @@ export const CapturePage = () => {
                   <img
                     src={previewUrl}
                     alt="Uploaded preview"
-                    className="max-h-56 mx-auto rounded-xl object-contain border border-purple-900/40 shadow-md"
+                    className="max-h-56 mx-auto rounded object-contain border border-zinc-800"
                   />
-                  <p className="text-xs text-zinc-600">
+                  <p className="text-xs text-zinc-400">
                     Click or drop another image to replace ({selectedFile?.name})
                   </p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  <div className="w-16 h-16 rounded-2xl bg-purple-700/10 border border-purple-700/20 flex items-center justify-center text-purple-500 mx-auto">
-                    <Upload className="w-8 h-8" />
+                <div className="space-y-3">
+                  <div className="w-12 h-12 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 mx-auto">
+                    <Upload className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-zinc-300">
+                    <p className="text-sm font-medium text-zinc-200">
                       Drop screenshot here, or{' '}
-                      <span className="text-purple-400 underline">browse</span>
+                      <span className="text-blue-400 underline">browse</span>
                     </p>
-                    <p className="text-xs text-zinc-600 mt-1">Supports PNG, JPEG, WEBP (Max 10MB)</p>
+                    <p className="text-xs text-zinc-500 mt-1">Supports PNG, JPEG, WEBP (Max 10MB)</p>
                   </div>
                 </div>
               )}
@@ -248,40 +248,40 @@ export const CapturePage = () => {
           </div>
 
           {/* Caption & Process */}
-          <div className="md:col-span-5 flex flex-col justify-between glass-panel p-6 rounded-3xl border border-purple-900/30 space-y-4">
+          <div className="md:col-span-5 flex flex-col justify-between bg-zinc-950 p-5 rounded-lg border border-zinc-800 space-y-4">
             <div>
-              <div className="flex items-center gap-2 text-xs font-bold text-zinc-300 uppercase tracking-wider mb-2">
-                <FileText className="w-4 h-4 text-purple-500" />
-                <span>Personal Context / Caption</span>
+              <div className="flex items-center gap-2 text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">
+                <FileText className="w-4 h-4 text-zinc-400" />
+                <span>Context / Caption (Optional)</span>
               </div>
-              <p className="text-xs text-zinc-600 mb-3 leading-relaxed">
-                Add optional context to guide AI priority, category, and action relevance:
+              <p className="text-xs text-zinc-500 mb-2.5 leading-relaxed">
+                Add context to guide priority and action relevance:
               </p>
 
               <textarea
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
                 rows={4}
-                placeholder="e.g. 'This is about my Software Engineering assignment' or 'Mandatory college notice'…"
-                className="w-full p-3.5 bg-black/70 border border-purple-900/40 focus:border-purple-500 rounded-2xl text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-purple-500/40 transition leading-relaxed"
+                placeholder="e.g. 'Software Engineering assignment' or 'Semester fee notice'…"
+                className="w-full p-2.5 bg-black border border-zinc-800 focus:border-blue-600 rounded text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none transition-colors leading-relaxed"
               />
 
-              <div className="mt-3 space-y-1.5">
-                <span className="text-[10px] uppercase font-semibold text-zinc-600">
-                  Quick context signals:
+              <div className="mt-2.5 space-y-1.5">
+                <span className="text-[11px] font-medium text-zinc-500">
+                  Quick tags:
                 </span>
-                <div className="flex flex-wrap gap-1.5 text-[11px]">
+                <div className="flex flex-wrap gap-1.5 text-xs">
                   {[
                     'Mandatory submission',
                     'Optional hackathon',
-                    'Important exam fee',
-                    'CS301 Coursework',
+                    'Important fee notice',
+                    'Coursework deadline',
                   ].map((chip) => (
                     <button
                       key={chip}
                       type="button"
                       onClick={() => setCaption(chip)}
-                      className="px-2 py-0.5 rounded-lg bg-black/60 hover:bg-purple-900/20 text-zinc-500 hover:text-purple-300 border border-purple-900/20 hover:border-purple-700/30 transition"
+                      className="px-2 py-0.5 rounded bg-black hover:bg-zinc-900 text-zinc-400 hover:text-zinc-200 border border-zinc-800 transition-colors text-xs"
                     >
                       +{chip}
                     </button>
@@ -293,7 +293,7 @@ export const CapturePage = () => {
             <button
               onClick={handleProcess}
               disabled={!selectedFile || isProcessing}
-              className="w-full py-3.5 bg-purple-700 hover:bg-purple-600 disabled:opacity-50 text-white text-sm font-bold rounded-2xl transition flex items-center justify-center gap-2 shadow-lg shadow-purple-800/30"
+              className="w-full py-2.5 bg-blue-800 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium rounded transition-colors flex items-center justify-center gap-2 mt-3"
             >
               <Sparkles className="w-4 h-4" />
               <span>Extract & Save Memory</span>

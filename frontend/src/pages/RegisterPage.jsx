@@ -35,42 +35,42 @@ export const RegisterPage = () => {
   };
 
   const inputClass =
-    'w-full pl-10 pr-4 py-2.5 bg-black/60 border border-purple-900/50 hover:border-purple-700/60 focus:border-purple-500 rounded-xl text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-purple-500/50 transition';
+    'w-full pl-9 pr-3 py-2 bg-black border border-zinc-800 hover:border-zinc-700 focus:border-blue-600 rounded text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none transition-colors';
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-6 animate-slideUp">
+    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-sm space-y-5">
 
         {/* Header */}
-        <div className="text-center space-y-3">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-800 via-purple-600 to-violet-500 flex items-center justify-center text-white mx-auto shadow-2xl purple-glow-sm">
-            <Sparkles className="w-7 h-7" />
+        <div className="text-center space-y-2">
+          <div className="w-10 h-10 rounded bg-blue-800 flex items-center justify-center text-white mx-auto font-bold text-base">
+            S
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            Create your account
+          <h1 className="text-xl font-semibold text-white tracking-tight">
+            Create an account
           </h1>
-          <p className="text-xs sm:text-sm text-zinc-500">
-            Never miss an assignment deadline, fee notice, or circular again
+          <p className="text-xs text-zinc-400">
+            Never miss an assignment deadline, fee notice, or circular
           </p>
         </div>
 
         {/* Card */}
-        <div className="glass-panel p-7 rounded-3xl border border-purple-900/40 shadow-2xl">
+        <div className="bg-zinc-950 p-6 rounded-lg border border-zinc-800 shadow-xl">
           {error && (
-            <div className="mb-5 p-3.5 rounded-2xl bg-red-950/40 border border-red-500/30 text-red-300 text-xs flex items-start gap-2.5">
+            <div className="mb-4 p-2.5 rounded bg-red-950/60 border border-red-900 text-red-300 text-xs flex items-start gap-2">
               <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3.5">
             {/* Email */}
             <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
+              <label className="block text-xs font-medium text-zinc-300 mb-1">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-purple-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Mail className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="email"
                   value={email}
@@ -84,11 +84,11 @@ export const RegisterPage = () => {
 
             {/* Password */}
             <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
-                Password <span className="text-zinc-600 font-normal">(min 6 chars)</span>
+              <label className="block text-xs font-medium text-zinc-300 mb-1">
+                Password <span className="text-zinc-500 font-normal">(min 6 chars)</span>
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-purple-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="password"
                   value={password}
@@ -102,15 +102,15 @@ export const RegisterPage = () => {
 
             {/* Timezone */}
             <div>
-              <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
-                Timezone <span className="text-zinc-600 font-normal">(for accurate daily notices)</span>
+              <label className="block text-xs font-medium text-zinc-300 mb-1">
+                Timezone <span className="text-zinc-500 font-normal">(for daily notices)</span>
               </label>
               <div className="relative">
-                <Globe className="w-4 h-4 text-purple-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Globe className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <select
                   value={timezone}
                   onChange={(e) => setTimezone(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-black/60 border border-purple-900/50 hover:border-purple-700/60 focus:border-purple-500 rounded-xl text-xs text-zinc-200 focus:outline-none transition"
+                  className="w-full pl-9 pr-3 py-2 bg-black border border-zinc-800 hover:border-zinc-700 focus:border-blue-600 rounded text-xs text-zinc-200 focus:outline-none transition-colors"
                 >
                   <option value="Asia/Kolkata">Asia/Kolkata (IST — UTC+5:30)</option>
                   <option value="America/New_York">America/New_York (EST — UTC-5:00)</option>
@@ -125,7 +125,7 @@ export const RegisterPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-purple-700 hover:bg-purple-600 disabled:opacity-50 text-white text-sm font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-purple-800/40 mt-2"
+              className="w-full py-2 bg-blue-800 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium rounded transition-colors flex items-center justify-center gap-2 mt-2"
             >
               {isLoading ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -138,9 +138,9 @@ export const RegisterPage = () => {
             </button>
           </form>
 
-          <div className="mt-6 pt-4 border-t border-purple-900/30 text-center text-xs text-zinc-500">
+          <div className="mt-5 pt-3.5 border-t border-zinc-800 text-center text-xs text-zinc-400">
             Already have an account?{' '}
-            <Link to="/login" className="font-semibold text-purple-400 hover:text-purple-300 transition">
+            <Link to="/login" className="font-medium text-blue-400 hover:text-blue-300 transition-colors">
               Sign in
             </Link>
           </div>

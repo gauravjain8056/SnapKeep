@@ -14,7 +14,7 @@ const ProtectedRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-black">
         <LoadingSpinner size="lg" message="Loading SnapKeep..." />
       </div>
     );
@@ -28,7 +28,7 @@ const PublicRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-black">
         <LoadingSpinner size="lg" message="Loading SnapKeep..." />
       </div>
     );
@@ -40,10 +40,10 @@ const PublicRoute = ({ children }) => {
 const AppLayout = ({ children }) => {
   const { isAuthenticated } = useAuth();
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100">
+    <div className="min-h-screen flex flex-col bg-black text-zinc-100">
       {isAuthenticated && <Navbar />}
       <main className="flex-1">{children}</main>
-      <footer className="py-6 border-t border-slate-900 text-center text-xs text-slate-500">
+      <footer className="py-6 border-t border-zinc-900 text-center text-xs text-zinc-500">
         SnapKeep — AI-Powered Personal Information & Action Memory
       </footer>
     </div>
